@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  githubId    String   @unique
+  username    String
+  accessToken String
+  createdAt   DateTime @default(now())
+  repos       Repo[]
+}
+
+model Repo {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  owner         String
+  name          String
+  webhookId     Int?
+  webhookSecret String
+  active        Boolean  @default(true)
+  rules         Rule[]
+  events        Event[]
+
+  @@unique([userId, owner, name])
+}
+
+model Rule {
+  id            String   @id @default(cuid())
+  repoId        String
+  repo          Repo     @relation(fields: [repoId], references: [id])
+  eventType     String
+  matchField    String
+  matchType     String
+  matchValue    String
+  actionLabel   String?
+  actionComment String?
+  notifySlack   Boolean  @default(true)
+  createdAt     DateTime @default(now())
+}
+
+model Event {
+  id         String      @id @default(cuid())
+  deliveryId String      @unique
+  repoId     String
+  repo       Repo        @relation(fields: [repoId], references: [id])
+  eventType  String
+  action     String?
+  payload    Json
+  receivedAt DateTime    @default(now())
+  actions    ActionLog[]
+}
+
+model ActionLog {
+  id         String   @id @default(cuid())
+  eventId    String
+  event      Event    @relation(fields: [eventId], references: [id])
+  actionType String
+  status     String
+  attempts   Int      @default(1)
+  error      String?
+  details    Json?
+  createdAt  DateTime @default(now())
+}
