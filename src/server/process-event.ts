@@ -2,7 +2,7 @@ import { ActionLog, Event, Prisma, Repo, Rule, User } from "@prisma/client";
 import { addIssueComment, addIssueLabels } from "@/server/github";
 import { prisma } from "@/server/prisma";
 import { buildDefaultRule, getActionMessage, matchesRule, renderTemplate } from "@/server/rules";
-import { sendSlackMessage } from "@/server/slack";
+import { sendSlackMessage, buildSlackBlockKitMessage } from "@/server/slack";
 
 type EventWithRelations = Event & {
   repo: Repo & { user: User; rules: Rule[] };
@@ -16,7 +16,7 @@ export async function processEvent(event: EventWithRelations) {
   const activeRules = fallbackRule ? [fallbackRule] : rules;
 
   for (const rule of activeRules) {
-    if (rule.actionLabel) {
+    if (rule.actionLabel && eventType !== "push") {
       await runAction(event, "github_label", async () => {
         const issueNumber = getIssueNumber(payload);
         if (!issueNumber) throw new Error("No issue or pull request number in payload");
@@ -33,7 +33,7 @@ export async function processEvent(event: EventWithRelations) {
       });
     }
 
-    if (rule.actionComment) {
+    if (rule.actionComment && eventType !== "push") {
       await runAction(event, "github_comment", async () => {
         const issueNumber = getIssueNumber(payload);
         if (!issueNumber) throw new Error("No issue or pull request number in payload");
@@ -51,10 +51,10 @@ export async function processEvent(event: EventWithRelations) {
     }
 
     if (rule.notifySlack) {
-      const message = getActionMessage(event.repo.owner, event.repo.name, event.eventType, payload);
+      const blockMessage = buildSlackBlockKitMessage(event.repo.owner, event.repo.name, event.eventType, payload);
       await runAction(event, "slack_notify", async () => {
-        await sendSlackMessage(message);
-      }, { message });
+        await sendSlackMessage(blockMessage);
+      }, { message: blockMessage.text });
     }
   }
 }

@@ -7,6 +7,8 @@ import { prisma } from "@/server/prisma";
 import AvailableRepos from "@/components/available-repos";
 import { getEventSummary } from "@/server/rules";
 import EventDetailsExpanded from "@/components/event-details-expanded";
+import RulesForm from "@/components/rules-form";
+import RecentEventsList from "@/components/recent-events-list";
 
 export const dynamic = "force-dynamic";
 
@@ -114,48 +116,7 @@ export default async function DashboardPage() {
       </section>
 
       <section className="grid-2">
-        <div className="panel">
-          <h2>
-            <span>Recent events</span>
-          </h2>
-          <p className="muted" style={{ marginBottom: 20 }}>Webhooks captured and stored with signature and replay verification.</p>
-          <ul className="log-list">
-            {recentEvents.length === 0 ? (
-              <li className="log-card">
-                <div className="stack" style={{ gap: 8 }}>
-                  <strong>No events captured yet</strong>
-                  <span className="log-meta">Once a webhook arrives, it will appear here with its action log.</span>
-                </div>
-              </li>
-            ) : (
-              recentEvents.map((event) => {
-                const summary = getEventSummary(event.eventType, event.payload);
-                return (
-                  <li key={event.id} style={{ listStyle: "none" }}>
-                    <details className="event-details" style={{ width: "100%" }}>
-                      <summary className="log-card" suppressHydrationWarning style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <div className="stack" style={{ gap: 6 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <strong>{event.repo.owner}/{event.repo.name}</strong>
-                            <span className="badge" style={{ padding: "2px 8px", fontSize: "10px" }}>{summary.typeLabel}</span>
-                          </div>
-                          <span className="log-meta" style={{ fontWeight: "600", fontSize: "0.95rem" }}>
-                            {summary.title}
-                          </span>
-                          <span className="log-meta" style={{ fontSize: "0.82rem" }}>
-                            {summary.description} · by <strong>{summary.author}</strong> · {event.receivedAt.toLocaleTimeString()}
-                          </span>
-                        </div>
-                        <span className="badge muted" suppressHydrationWarning>{event.actions.length} actions</span>
-                      </summary>
-                      <EventDetailsExpanded event={event} />
-                    </details>
-                  </li>
-                );
-              })
-            )}
-          </ul>
-        </div>
+        <RecentEventsList initialEvents={recentEvents} />
 
         <div className="panel">
           <h2>
@@ -163,64 +124,7 @@ export default async function DashboardPage() {
           </h2>
           <p className="muted" style={{ marginBottom: 20 }}>Configure rule mappings. Unmatched webhooks fallback to default triggers.</p>
           
-          <form action="/api/rules" method="post" className="stack" style={{ marginBottom: 24 }}>
-            <div className="field-grid">
-              <label>
-                Repository
-                <select name="repoId" required defaultValue={connectedRepos[0]?.id ?? ""} suppressHydrationWarning>
-                  <option value="" disabled>
-                    Choose a repo
-                  </option>
-                  {connectedRepos.map((repo) => (
-                    <option key={repo.id} value={repo.id}>
-                      {repo.owner}/{repo.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Event type
-                <select name="eventType" defaultValue="issues" suppressHydrationWarning>
-                  <option value="issues">issues</option>
-                  <option value="pull_request">pull_request</option>
-                </select>
-              </label>
-              <label>
-                Match field
-                <select name="matchField" defaultValue="title" suppressHydrationWarning>
-                  <option value="title">title</option>
-                  <option value="body">body</option>
-                  <option value="author">author</option>
-                </select>
-              </label>
-              <label>
-                Match type
-                <select name="matchType" defaultValue="contains" suppressHydrationWarning>
-                  <option value="contains">contains</option>
-                  <option value="equals">equals</option>
-                </select>
-              </label>
-              <label>
-                Match value
-                <input name="matchValue" placeholder="bug" required suppressHydrationWarning />
-              </label>
-              <label>
-                Action label
-                <input name="actionLabel" placeholder="bug" suppressHydrationWarning />
-              </label>
-              <label>
-                Action comment template
-                <input name="actionComment" placeholder="Thanks for the report, {{author}}" suppressHydrationWarning />
-              </label>
-            </div>
-            <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", width: "fit-content", marginTop: 8 }}>
-              <input type="checkbox" name="notifySlack" defaultChecked suppressHydrationWarning />
-              <span>Notify Slack webhook channel</span>
-            </label>
-            <button className="button primary" type="submit" disabled={connectedRepos.length === 0} suppressHydrationWarning style={{ width: "100%" }}>
-              Add new rule mapping
-            </button>
-          </form>
+          <RulesForm connectedRepos={connectedRepos} />
 
           <div style={{ overflowX: "auto", width: "100%", WebkitOverflowScrolling: "touch" }}>
             <table className="table" style={{ width: "100%", minWidth: "500px" }}>

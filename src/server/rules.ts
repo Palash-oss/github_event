@@ -45,7 +45,17 @@ type WebhookPayload = {
 export function getPayloadValue(payload: WebhookPayload, field: string): string {
   if (field === "title") return stringValue(payload.issue?.title ?? payload.pull_request?.title);
   if (field === "body") return stringValue(payload.issue?.body ?? payload.pull_request?.body);
-  if (field === "author") return stringValue(payload.sender?.login ?? payload.issue?.user?.login ?? payload.pull_request?.user?.login);
+  if (field === "author") {
+    return stringValue(
+      payload.sender?.login ?? 
+      payload.issue?.user?.login ?? 
+      payload.pull_request?.user?.login ?? 
+      payload.pusher?.name ?? 
+      payload.head_commit?.author?.username
+    );
+  }
+  if (field === "message") return stringValue(payload.head_commit?.message ?? payload.commits?.[0]?.message);
+  if (field === "ref") return stringValue(payload.ref);
   return "";
 }
 
