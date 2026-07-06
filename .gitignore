@@ -7,3 +7,4 @@ node_modules
 coverage
 *.log
 prisma/dev.db
+DEMO_VIDEO_GUIDE.md
