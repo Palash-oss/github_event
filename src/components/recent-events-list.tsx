@@ -97,6 +97,13 @@ export default function RecentEventsList({ initialEvents }: RecentEventsListProp
                               <span className={`badge ${act.status === "success" ? "success" : act.status === "failed" ? "warn" : "muted"}`} style={{ padding: "1px 6px", fontSize: "11px", marginLeft: 4 }}>
                                 {act.status}
                               </span>
+                              {act.details && (
+                                <span className="muted" style={{ fontSize: "0.8rem", marginLeft: 6 }}>
+                                  {act.actionType === "github_label" && `— labeled "#${(act.details as any).label ?? ""}"`}
+                                  {act.actionType === "github_comment" && `— commented on #${(act.details as any).issueNumber ?? "?"}`}
+                                  {act.actionType === "slack_notify" && "— Slack notified"}
+                                </span>
+                              )}
                             </li>
                           ))}
                         </ul>

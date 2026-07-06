@@ -189,25 +189,72 @@ export default function EventDetailsExpanded({ event }: EventDetailsExpandedProp
 
         {/* 2. Action Logs */}
         <div style={{ borderTop: "1px solid var(--panel-border)", paddingTop: 16 }}>
-          <strong style={{ display: "block", marginBottom: 8, fontSize: "0.95rem" }}>Action Execution Log:</strong>
+          <strong style={{ display: "block", marginBottom: 12, fontSize: "0.95rem" }}>Automation Actions:</strong>
           {event.actions.length === 0 ? (
-            <span className="muted" style={{ fontStyle: "italic", fontSize: "0.88rem" }}>
-              No rules matched this event. No labels, comments, or Slack notifications were triggered.
-            </span>
+            <div style={{ background: "rgba(0,0,0,0.02)", border: "1px dashed var(--panel-border)", borderRadius: 10, padding: "16px 20px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                <span style={{ fontSize: "1.2rem" }}>💤</span>
+                <strong style={{ fontSize: "0.92rem" }}>No automation triggered</strong>
+              </div>
+              <p className="muted" style={{ fontSize: "0.85rem", lineHeight: 1.6, margin: 0 }}>
+                This webhook was received and stored, but no rule in your rules engine matched it.
+                The event type was <code style={{ background: "var(--bg)", padding: "1px 6px", borderRadius: 4 }}>{event.eventType}</code>.
+              </p>
+              <p className="muted" style={{ fontSize: "0.82rem", lineHeight: 1.6, margin: "8px 0 0" }}>
+                ➡ To automate actions for this event, go to your dashboard and add a new rule under <strong>Rules snapshot</strong>.
+              </p>
+            </div>
           ) : (
-            <ul className="stack" style={{ gap: 8, paddingLeft: 16 }}>
-              {event.actions.map((act) => (
-                <li key={act.id} style={{ listStyleType: "square", fontSize: "0.9rem" }}>
-                  <code>{act.actionType}</code>: <span className={`badge ${act.status === "success" ? "success" : act.status === "failed" ? "warn" : "muted"}`} style={{ padding: "1px 6px", fontSize: "11px", marginLeft: 6 }}>{act.status}</span>
-                  {act.attempts > 1 && <span className="muted" style={{ fontSize: "0.8rem", marginLeft: 8 }}>(Attempts: {act.attempts})</span>}
-                  {act.error && (
-                    <div style={{ color: "var(--danger)", background: "var(--danger-bg)", padding: "8px 12px", borderRadius: "6px", border: "1px solid rgba(229, 72, 77, 0.12)", fontSize: "0.82rem", fontFamily: "var(--font-mono)", marginTop: 4 }}>
-                      {act.error}
+            <div className="stack" style={{ gap: 10 }}>
+              {event.actions.map((act) => {
+                const ctx = (act.details as Record<string, any>) ?? {};
+                const isSuccess = act.status === "success";
+                const isFailed = act.status === "failed";
+
+                // Build a human-readable description of what the action did
+                let actionDescription: string | null = null;
+                if (act.actionType === "github_label") {
+                  actionDescription = isSuccess
+                    ? `Added label "${ctx.label ?? "unknown"}" to issue/PR #${ctx.issueNumber ?? "?"} on GitHub.`
+                    : `Tried to add label "${ctx.label ?? "unknown"}" but it failed.`;
+                } else if (act.actionType === "github_comment") {
+                  actionDescription = isSuccess
+                    ? `Posted a comment on issue/PR #${ctx.issueNumber ?? "?"}: "${String(ctx.comment ?? "").slice(0, 80)}${String(ctx.comment ?? "").length > 80 ? "…" : ""}"` 
+                    : `Tried to post a comment on issue/PR #${ctx.issueNumber ?? "?"} but it failed.`;
+                } else if (act.actionType === "slack_notify") {
+                  actionDescription = isSuccess
+                    ? `Sent a Slack Block Kit notification: "${String(ctx.message ?? "").slice(0, 80)}${String(ctx.message ?? "").length > 80 ? "…" : ""}"` 
+                    : `Tried to notify Slack but the webhook delivery failed.`;
+                }
+
+                return (
+                  <div key={act.id} style={{ background: isSuccess ? "rgba(48, 164, 108, 0.06)" : isFailed ? "rgba(229, 72, 77, 0.06)" : "rgba(0,0,0,0.02)", border: `1px solid ${isSuccess ? "rgba(48,164,108,0.2)" : isFailed ? "rgba(229,72,77,0.2)" : "var(--panel-border)"}`, borderRadius: 10, padding: "12px 16px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: actionDescription ? 8 : 0 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ fontSize: "1rem" }}>
+                          {act.actionType === "github_label" ? "🏷️" : act.actionType === "github_comment" ? "💬" : act.actionType === "slack_notify" ? "📣" : "⚙️"}
+                        </span>
+                        <code style={{ fontSize: "0.85rem" }}>{act.actionType}</code>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span className={`badge ${isSuccess ? "success" : isFailed ? "warn" : "muted"}`} style={{ padding: "2px 8px", fontSize: "11px" }}>
+                          {act.status}
+                        </span>
+                        {act.attempts > 1 && <span className="muted" style={{ fontSize: "0.78rem" }}>({act.attempts} attempts)</span>}
+                      </div>
                     </div>
-                  )}
-                </li>
-              ))}
-            </ul>
+                    {actionDescription && (
+                      <p style={{ margin: 0, fontSize: "0.85rem", color: "var(--text)", lineHeight: 1.5 }}>{actionDescription}</p>
+                    )}
+                    {act.error && (
+                      <div style={{ color: "var(--danger)", background: "var(--danger-bg)", padding: "8px 12px", borderRadius: 6, border: "1px solid rgba(229, 72, 77, 0.12)", fontSize: "0.82rem", fontFamily: "var(--font-mono)", marginTop: 8 }}>
+                        {act.error}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           )}
         </div>
 
