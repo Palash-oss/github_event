@@ -20,7 +20,6 @@ export default function AvailableRepos({ connectedRepoKeys }: AvailableReposProp
   const [repos, setRepos] = useState<RepoDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [search, setSearch] = useState("");
   const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
@@ -45,15 +44,9 @@ export default function AvailableRepos({ connectedRepoKeys }: AvailableReposProp
 
   const connectedSet = new Set(connectedRepoKeys);
 
-  // Filter by search query
-  const filtered = repos.filter((r) =>
-    r.fullName.toLowerCase().includes(search.toLowerCase()) ||
-    (r.description || "").toLowerCase().includes(search.toLowerCase())
-  );
-
   const PAGE_SIZE = 5;
-  const visibleRepos = search ? filtered : (showAll ? filtered : filtered.slice(0, PAGE_SIZE));
-  const hasMore = !search && filtered.length > PAGE_SIZE && !showAll;
+  const visibleRepos = showAll ? repos : repos.slice(0, PAGE_SIZE);
+  const hasMore = repos.length > PAGE_SIZE && !showAll;
 
   return (
     <div className="panel">
@@ -71,32 +64,8 @@ export default function AvailableRepos({ connectedRepoKeys }: AvailableReposProp
         Repos you can connect from GitHub. Connect one to start receiving webhook events.
       </p>
 
-      {/* Search box */}
-      {!isLoading && !error && repos.length > 0 && (
-        <div style={{ marginBottom: 16 }}>
-          <input
-            type="text"
-            placeholder="🔍  Search repos by name…"
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setShowAll(false); }}
-            suppressHydrationWarning
-            style={{
-              width: "100%",
-              padding: "10px 14px",
-              borderRadius: 10,
-              border: "1px solid var(--panel-border)",
-              background: "var(--bg)",
-              color: "var(--text)",
-              fontSize: "0.9rem",
-              outline: "none",
-              boxSizing: "border-box",
-              transition: "border-color 0.2s"
-            }}
-            onFocus={(e) => (e.target.style.borderColor = "var(--text)")}
-            onBlur={(e) => (e.target.style.borderColor = "var(--panel-border)")}
-          />
-        </div>
-      )}
+
+
 
       {isLoading ? (
         <ul className="repo-list">
@@ -128,10 +97,6 @@ export default function AvailableRepos({ connectedRepoKeys }: AvailableReposProp
             </div>
           </li>
         </ul>
-      ) : filtered.length === 0 ? (
-        <div style={{ padding: "20px 0", textAlign: "center", color: "var(--muted)", fontSize: "0.9rem" }}>
-          No repos matching <strong>"{search}"</strong>
-        </div>
       ) : (
         <>
           <ul className="repo-list">
@@ -192,10 +157,10 @@ export default function AvailableRepos({ connectedRepoKeys }: AvailableReposProp
                 (e.target as HTMLButtonElement).style.borderColor = "var(--panel-border)";
               }}
             >
-              Show {filtered.length - PAGE_SIZE} more repos ↓
+              Show {repos.length - PAGE_SIZE} more repos ↓
             </button>
           )}
-          {showAll && filtered.length > PAGE_SIZE && !search && (
+          {showAll && repos.length > PAGE_SIZE && (
             <button
               onClick={() => setShowAll(false)}
               style={{
