@@ -61,8 +61,8 @@ export default function AvailableRepos({ connectedRepoKeys }: AvailableReposProp
         <h2 style={{ margin: 0 }}>
           <span>Available repos</span>
           {!isLoading && repos.length > 0 && (
-            <span className="badge muted" style={{ marginLeft: 10, fontSize: "0.78rem", fontWeight: 500 }}>
-              {repos.length} total
+            <span className="badge muted" style={{ marginLeft: 10, fontSize: "0.78rem", fontWeight: 500 }} title="Total repos fetched from GitHub">
+              {repos.length} repos
             </span>
           )}
         </h2>

@@ -6,13 +6,15 @@ export function createOctokit(accessToken: string) {
 
 export async function listAccessibleRepos(accessToken: string) {
   const octokit = createOctokit(accessToken);
-  const response = await octokit.repos.listForAuthenticatedUser({
+
+  // paginate() automatically follows GitHub's Link headers until all pages are fetched
+  const allRepos = await octokit.paginate(octokit.repos.listForAuthenticatedUser, {
     per_page: 100,
     affiliation: "owner,collaborator,organization_member",
     sort: "updated"
   });
 
-  return response.data.map((repo) => ({
+  return allRepos.map((repo) => ({
     id: repo.id,
     name: repo.name,
     owner: repo.owner.login,
@@ -22,6 +24,7 @@ export async function listAccessibleRepos(accessToken: string) {
     description: repo.description ?? ""
   }));
 }
+
 
 export async function createOrUpdateWebhook(params: {
   accessToken: string;
