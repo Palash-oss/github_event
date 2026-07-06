@@ -5,6 +5,7 @@ import type { Prisma } from "@prisma/client";
 import { authOptions } from "@/server/auth";
 import { prisma } from "@/server/prisma";
 import AvailableRepos from "@/components/available-repos";
+import { getEventSummary } from "@/server/rules";
 
 export const dynamic = "force-dynamic";
 
@@ -126,47 +127,55 @@ export default async function DashboardPage() {
                 </div>
               </li>
             ) : (
-              recentEvents.map((event) => (
-                <li key={event.id} style={{ listStyle: "none" }}>
-                  <details className="event-details" style={{ width: "100%" }}>
-                    <summary className="log-card" suppressHydrationWarning>
-                      <div className="stack" style={{ gap: 6 }}>
-                        <strong>{event.repo.owner}/{event.repo.name}</strong>
-                        <span className="log-meta">
-                          <span className="badge" style={{ padding: "2px 8px", fontSize: "10px", marginRight: 6 }}>{event.eventType}</span>
-                          <code>{event.action ?? "no-action"}</code> · {event.receivedAt.toLocaleTimeString()}
-                        </span>
-                      </div>
-                      <span className="badge muted" suppressHydrationWarning>{event.actions.length} actions</span>
-                    </summary>
-                    <div className="event-expanded-content" style={{ marginTop: 12, padding: "20px", background: "rgba(28, 27, 25, 0.03)", borderRadius: 12, border: "1px solid var(--panel-border)", fontSize: "0.9rem" }}>
-                      <div className="stack" style={{ gap: 16 }}>
-                        <div>
-                          <strong style={{ display: "block", marginBottom: 8 }}>Action Execution Log:</strong>
-                          {event.actions.length === 0 ? (
-                            <span className="muted">No actions were matched or executed.</span>
-                          ) : (
-                            <ul className="stack" style={{ gap: 8, paddingLeft: 20 }}>
-                              {event.actions.map((act) => (
-                                <li key={act.id} style={{ listStyleType: "square" }}>
-                                  <code>{act.actionType}</code>: <span style={{ color: act.status === "success" ? "var(--success, #34c759)" : "var(--danger, #ff3b30)", fontWeight: "bold" }}>{act.status}</span>
-                                  {act.error && <code style={{ display: "block", color: "var(--danger, #ff3b30)", marginTop: 4, background: "rgba(255,59,48,0.05)", padding: "6px 12px", borderRadius: 6 }}>Error: {act.error}</code>}
-                                </li>
-                              ))}
-                            </ul>
-                          )}
+              recentEvents.map((event) => {
+                const summary = getEventSummary(event.eventType, event.payload);
+                return (
+                  <li key={event.id} style={{ listStyle: "none" }}>
+                    <details className="event-details" style={{ width: "100%" }}>
+                      <summary className="log-card" suppressHydrationWarning style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div className="stack" style={{ gap: 6 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <strong>{event.repo.owner}/{event.repo.name}</strong>
+                            <span className="badge" style={{ padding: "2px 8px", fontSize: "10px" }}>{summary.typeLabel}</span>
+                          </div>
+                          <span className="log-meta" style={{ fontWeight: "600", fontSize: "0.95rem" }}>
+                            {summary.title}
+                          </span>
+                          <span className="log-meta" style={{ fontSize: "0.82rem" }}>
+                            {summary.description} · by <strong>{summary.author}</strong> · {event.receivedAt.toLocaleTimeString()}
+                          </span>
                         </div>
-                        <div>
-                          <strong style={{ display: "block", marginBottom: 8 }}>Raw Webhook Payload:</strong>
-                          <pre style={{ margin: 0, padding: 16, background: "var(--bg)", border: "1px solid var(--panel-border)", borderRadius: 8, overflow: "auto", maxHeight: "250px", fontSize: "0.82rem" }}>
-                            <code>{JSON.stringify(event.payload, null, 2)}</code>
-                          </pre>
+                        <span className="badge muted" suppressHydrationWarning>{event.actions.length} actions</span>
+                      </summary>
+                      <div className="event-expanded-content" style={{ marginTop: 12, padding: "20px", background: "rgba(28, 27, 25, 0.03)", borderRadius: 12, border: "1px solid var(--panel-border)", fontSize: "0.9rem" }}>
+                        <div className="stack" style={{ gap: 16 }}>
+                          <div>
+                            <strong style={{ display: "block", marginBottom: 8 }}>Action Execution Log:</strong>
+                            {event.actions.length === 0 ? (
+                              <span className="muted">No actions were matched or executed.</span>
+                            ) : (
+                              <ul className="stack" style={{ gap: 8, paddingLeft: 20 }}>
+                                {event.actions.map((act) => (
+                                  <li key={act.id} style={{ listStyleType: "square" }}>
+                                    <code>{act.actionType}</code>: <span style={{ color: act.status === "success" ? "var(--success, #34c759)" : "var(--danger, #ff3b30)", fontWeight: "bold" }}>{act.status}</span>
+                                    {act.error && <code style={{ display: "block", color: "var(--danger, #ff3b30)", marginTop: 4, background: "rgba(255,59,48,0.05)", padding: "6px 12px", borderRadius: 6 }}>Error: {act.error}</code>}
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                          <div>
+                            <strong style={{ display: "block", marginBottom: 8 }}>Raw Webhook Payload:</strong>
+                            <pre style={{ margin: 0, padding: 16, background: "var(--bg)", border: "1px solid var(--panel-border)", borderRadius: 8, overflow: "auto", maxHeight: "250px", fontSize: "0.82rem" }}>
+                              <code>{JSON.stringify(event.payload, null, 2)}</code>
+                            </pre>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </details>
-                </li>
-              ))
+                    </details>
+                  </li>
+                );
+              })
             )}
           </ul>
         </div>
