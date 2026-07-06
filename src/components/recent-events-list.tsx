@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { Prisma } from "@prisma/client";
-import { getEventSummary } from "@/server/rules";
-import EventDetailsExpanded from "@/components/event-details-expanded";
+import { getEventSummary } from "@/lib/event-utils";
 
 type EventWithRepoAndActions = Prisma.EventGetPayload<{
   include: {
@@ -83,7 +82,27 @@ export default function RecentEventsList({ initialEvents }: RecentEventsListProp
                     </div>
                     <span className="badge muted" suppressHydrationWarning>{event.actions.length} actions</span>
                   </summary>
-                  <EventDetailsExpanded event={event} />
+                  <div style={{ padding: "16px 20px", background: "rgba(28, 27, 25, 0.03)", borderRadius: 12, border: "1px solid var(--panel-border)", marginTop: 8, fontSize: "0.9rem" }}>
+                    <p className="muted" style={{ fontStyle: "italic", fontSize: "0.88rem" }}>
+                      Expand in <a href="/dashboard/logs" style={{ color: "var(--text)", textDecoration: "underline" }}>Logs Archive</a> to see full event payload and action logs.
+                    </p>
+                    <div style={{ marginTop: 8 }}>
+                      {event.actions.length === 0 ? (
+                        <span className="muted" style={{ fontSize: "0.85rem", fontStyle: "italic" }}>No rules matched this event.</span>
+                      ) : (
+                        <ul style={{ paddingLeft: 16, margin: 0 }}>
+                          {event.actions.map((act: any) => (
+                            <li key={act.id} style={{ listStyleType: "square", fontSize: "0.88rem", marginBottom: 4 }}>
+                              <code>{act.actionType}</code>:{" "}
+                              <span className={`badge ${act.status === "success" ? "success" : act.status === "failed" ? "warn" : "muted"}`} style={{ padding: "1px 6px", fontSize: "11px", marginLeft: 4 }}>
+                                {act.status}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </div>
                 </details>
               </li>
             );

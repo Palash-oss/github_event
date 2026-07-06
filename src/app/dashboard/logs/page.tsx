@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/server/auth";
 import { prisma } from "@/server/prisma";
-import { getEventSummary } from "@/server/rules";
+import { getEventSummary } from "@/lib/event-utils";
 import Link from "next/link";
 import EventDetailsExpanded from "@/components/event-details-expanded";
 

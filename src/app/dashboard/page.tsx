@@ -5,7 +5,7 @@ import type { Prisma } from "@prisma/client";
 import { authOptions } from "@/server/auth";
 import { prisma } from "@/server/prisma";
 import AvailableRepos from "@/components/available-repos";
-import { getEventSummary } from "@/server/rules";
+import { getEventSummary } from "@/lib/event-utils";
 import EventDetailsExpanded from "@/components/event-details-expanded";
 import RulesForm from "@/components/rules-form";
 import RecentEventsList from "@/components/recent-events-list";
