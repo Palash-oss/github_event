@@ -59,6 +59,10 @@ export default async function DashboardPage() {
 
   const connectedRepoKeys = connectedRepos.map((repo) => `${repo.owner}/${repo.name}`);
 
+  // Serialize dates to prevent Next.js Server-Client boundary serialization errors
+  const serializedRecentEvents = JSON.parse(JSON.stringify(recentEvents));
+  const serializedConnectedRepos = JSON.parse(JSON.stringify(connectedRepos));
+
   return (
     <main className="shell stack fade-in-section">
       <section className="hero" style={{ gridTemplateColumns: "1fr" }}>
@@ -116,7 +120,7 @@ export default async function DashboardPage() {
       </section>
 
       <section className="grid-2">
-        <RecentEventsList initialEvents={recentEvents} />
+        <RecentEventsList initialEvents={serializedRecentEvents} />
 
         <div className="panel">
           <h2>
@@ -124,7 +128,7 @@ export default async function DashboardPage() {
           </h2>
           <p className="muted" style={{ marginBottom: 20 }}>Configure rule mappings. Unmatched webhooks fallback to default triggers.</p>
           
-          <RulesForm connectedRepos={connectedRepos} />
+          <RulesForm connectedRepos={serializedConnectedRepos} />
 
           <div style={{ overflowX: "auto", width: "100%", WebkitOverflowScrolling: "touch" }}>
             <table className="table" style={{ width: "100%", minWidth: "500px" }}>
