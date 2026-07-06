@@ -1,13 +1,19 @@
 # AI Notes
 
-Tools used: VS Code workspace tools, file inspection, patch-based edits, and terminal validation.
+## Tools and Collaboration
+* **Tools**: We used Next.js 14, Auth.js (GitHub Provider), Prisma ORM, Neon Postgres, Octokit REST/Webhooks, and Tailwind/Vanilla CSS.
+* **Work Split**: I (the AI) suggested technical designs, wrote code, handled database integrations, and built the visual parser and UI layout fixes. The user verified deployments, tested the webhooks manually, and requested critical UX improvements for event-level details and responsiveness.
 
-Decisions I made:
+## Key Architecture & Design Decisions
+1. **JWT Sessions for Auth**: Used JWT sessions instead of database-backed sessions. This allowed storing GitHub OAuth access tokens directly on the `User` table without cluttering the database schema with the full Auth.js adapter tables.
+2. **Database-Level Idempotency**: Verified and stored GitHub `deliveryId` in the `Event` table with a unique constraint. If GitHub delivers the same webhook twice, the database uniqueness constraint safely rejects the second attempt at the persistence layer, defending against race conditions.
+3. **Timed/Queued Retries**: Wrapped downstream external calls (GitHub comment/label writes, Slack notifications) in individual try-catch blocks logging to `ActionLog`. If one fails, the webhook route still responds with `200 OK` instantly, and the retry sweeper route (`/api/retry-sweep`) picks up failures in the background using backoff.
+4. **Rich Visualizer for Events**: Swapped the simple JSON payload display for a parser (`EventDetailsExpanded`) that automatically details branches, commits, colored file status badges (Added/Modified/Removed) for pushes, and merged branches/additions/deletions for pull requests.
 
-1. I used JWT sessions instead of Auth.js database sessions so the app can store GitHub OAuth data in Prisma without adding the full Auth.js adapter schema.
-2. I kept webhook processing on the server and used a database `deliveryId` uniqueness constraint so duplicate GitHub deliveries are handled safely at the persistence layer.
-3. I added a retry sweep route that only retries failed action logs with exponential backoff, because downstream APIs are more likely to fail transiently than the webhook verification path.
+## Hardest Bug & Resolution
+* **Timing & Webhook Activation Gap**: The user reported that a commit push and an issue they created did not show up in the logs. After querying the database records and GitHub API webhook delivery logs, we discovered that both events occurred *minutes before* the user finished connecting their repository (which creates the webhook). We resolved this by explaining that webhooks are not retroactive and that the user needed to trigger a new event.
+* **Empty Logs Archive & UI Container Breakouts**: The logs archive page was originally only loading `ActionLog` entries, meaning if webhooks didn't match any active rules, the archive page looked completely blank/broken. Additionally, when raw JSON payloads were expanded, they broke out of their responsive flex column boxes on the dashboard. We fixed this by rewriting the logs archive to load all webhook `Event` entries (displaying them as collapsible cards) and restricting text wrapping and overflow-x scroll boundaries on code blocks.
 
-Hardest bug I had to avoid: firing webhook processing before verifying the HMAC signature would have made forged requests dangerous. I caught that by keeping the signature check in the webhook route before the event insert.
-
-What I would add with more time: configurable rule editing, richer event filtering, and a safer background execution mechanism for webhook follow-up work.
+## Future Improvements
+* **WebSocket Live Stream**: Use WebSockets or Server-Sent Events (SSE) to push new webhook deliveries to the dashboard instantly without manual page refreshes.
+* **Granular Rules Editor**: Support advanced rule conjunctions (e.g., matching BOTH title and author) and custom action scripting.
