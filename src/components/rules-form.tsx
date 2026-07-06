@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import type { Prisma } from "@prisma/client";
 
 type RepoWithRules = Prisma.RepoGetPayload<{
@@ -13,6 +13,9 @@ interface RulesFormProps {
 
 export default function RulesForm({ connectedRepos }: RulesFormProps) {
   const [eventType, setEventType] = useState("issues");
+  const [status, setStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
+  const [message, setMessage] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
 
   // Determine available match fields based on event type
   const getMatchFields = () => {
@@ -31,8 +34,58 @@ export default function RulesForm({ connectedRepos }: RulesFormProps) {
     ];
   };
 
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setStatus("saving");
+    setMessage("");
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    try {
+      const res = await fetch("/api/rules", {
+        method: "POST",
+        body: formData
+      });
+
+      if (res.ok) {
+        setStatus("success");
+        setMessage("✅ Rule saved! It will now automatically match incoming webhooks.");
+        formRef.current?.reset();
+        // Auto-dismiss after 4s and reload to show the new rule
+        setTimeout(() => {
+          setStatus("idle");
+          setMessage("");
+          window.location.reload();
+        }, 3000);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setStatus("error");
+        setMessage(`❌ Failed to save rule: ${data.error ?? res.statusText}`);
+      }
+    } catch (err) {
+      setStatus("error");
+      setMessage("❌ Network error — make sure you are signed in and try again.");
+    }
+  }
+
   return (
-    <form action="/api/rules" method="post" className="stack" style={{ marginBottom: 24 }}>
+    <form ref={formRef} onSubmit={handleSubmit} className="stack" style={{ marginBottom: 24 }}>
+      {/* Status banner */}
+      {status !== "idle" && (
+        <div style={{
+          padding: "12px 16px",
+          borderRadius: 10,
+          border: `1px solid ${status === "success" ? "rgba(48,164,108,0.3)" : status === "error" ? "rgba(229,72,77,0.3)" : "var(--panel-border)"}`,
+          background: status === "success" ? "rgba(48,164,108,0.08)" : status === "error" ? "rgba(229,72,77,0.08)" : "rgba(0,0,0,0.02)",
+          fontSize: "0.9rem",
+          fontWeight: 500,
+          color: status === "success" ? "rgb(48,164,108)" : status === "error" ? "rgb(229,72,77)" : "var(--text)"
+        }}>
+          {status === "saving" ? "⏳ Saving rule..." : message}
+        </div>
+      )}
+
       <div className="field-grid">
         <label>
           Repository
@@ -121,13 +174,19 @@ export default function RulesForm({ connectedRepos }: RulesFormProps) {
         </div>
       )}
 
+      {eventType !== "push" && (
+        <div style={{ fontSize: "0.82rem", color: "var(--muted)", background: "rgba(0,0,0,0.01)", padding: "10px 14px", borderRadius: "8px", border: "1px dotted var(--panel-border)", marginTop: -8 }}>
+          💡 <strong>Tip</strong>: Match field <code>action</code> = <code>closed</code> to trigger actions when a developer resolves an issue. Match field <code>action</code> = <code>opened</code> to trigger when a new issue is reported.
+        </div>
+      )}
+
       <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", width: "fit-content", marginTop: 8 }}>
         <input type="checkbox" name="notifySlack" defaultChecked suppressHydrationWarning />
         <span>Notify Slack webhook channel</span>
       </label>
-      
-      <button className="button primary" type="submit" disabled={connectedRepos.length === 0} suppressHydrationWarning style={{ width: "100%" }}>
-        Add new rule mapping
+
+      <button type="submit" className="btn" disabled={status === "saving"} style={{ opacity: status === "saving" ? 0.6 : 1, cursor: status === "saving" ? "not-allowed" : "pointer" }}>
+        {status === "saving" ? "Saving…" : "Save rule"}
       </button>
     </form>
   );
