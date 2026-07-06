@@ -222,36 +222,38 @@ export default async function DashboardPage() {
             </button>
           </form>
 
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Repo</th>
-                <th>Rule condition</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {connectedRepos.flatMap((repo) =>
-                repo.rules.map((rule) => (
-                  <tr key={rule.id}>
-                    <td><strong>{repo.owner}/{repo.name}</strong></td>
-                    <td style={{ fontSize: "0.9rem" }}>
-                      <span className="badge" style={{ marginRight: 6 }}>{rule.eventType}</span>
-                      <code>{rule.matchField} {rule.matchType} &quot;{rule.matchValue}&quot;</code>
-                    </td>
-                    <td>
-                      <form action="/api/rules" method="post">
-                        <input type="hidden" name="intent" value="delete" />
-                        <input type="hidden" name="repoId" value={repo.id} />
-                        <input type="hidden" name="ruleId" value={rule.id} />
-                        <button className="button secondary" type="submit" suppressHydrationWarning style={{ padding: "6px 12px", borderRadius: "8px", fontSize: "0.8rem" }}>Delete</button>
-                      </form>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+          <div style={{ overflowX: "auto", width: "100%", WebkitOverflowScrolling: "touch" }}>
+            <table className="table" style={{ width: "100%", minWidth: "500px" }}>
+              <thead>
+                <tr>
+                  <th>Repo</th>
+                  <th>Rule condition</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {connectedRepos.flatMap((repo) =>
+                  repo.rules.map((rule) => (
+                    <tr key={rule.id}>
+                      <td><strong>{repo.owner}/{repo.name}</strong></td>
+                      <td style={{ fontSize: "0.9rem" }}>
+                        <span className="badge" style={{ marginRight: 6 }}>{rule.eventType}</span>
+                        <code>{rule.matchField} {rule.matchType} &quot;{rule.matchValue}&quot;</code>
+                      </td>
+                      <td>
+                        <form action="/api/rules" method="post">
+                          <input type="hidden" name="intent" value="delete" />
+                          <input type="hidden" name="repoId" value={repo.id} />
+                          <input type="hidden" name="ruleId" value={rule.id} />
+                          <button className="button secondary" type="submit" suppressHydrationWarning style={{ padding: "6px 12px", borderRadius: "8px", fontSize: "0.8rem" }}>Delete</button>
+                        </form>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
     </main>

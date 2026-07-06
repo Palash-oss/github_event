@@ -973,3 +973,61 @@ details.event-details {
   border-radius: var(--radius-sm);
   font-size: 0.88rem;
 }
+
+/* Responsive adjustments for Dashboard elements */
+@media (max-width: 980px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .shell {
+    padding: 24px 0 60px;
+    gap: 24px;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    padding: 28px;
+    gap: 20px;
+  }
+
+  .panel {
+    padding: 24px;
+  }
+
+  .field-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  h1 {
+    font-size: 2.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .shell {
+    width: calc(100vw - 24px);
+  }
+
+  .hero, .panel {
+    padding: 20px;
+    border-radius: 12px;
+  }
+  
+  .log-card, .repo-card {
+    padding: 16px;
+    gap: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .log-card .badge, .repo-card button, .repo-card form {
+    align-self: stretch;
+    text-align: center;
+    justify-content: center;
+  }
+}
