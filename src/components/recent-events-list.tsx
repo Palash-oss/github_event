@@ -19,9 +19,11 @@ interface RecentEventsListProps {
 export default function RecentEventsList({ initialEvents }: RecentEventsListProps) {
   const [events, setEvents] = useState<EventWithRepoAndActions[]>(initialEvents);
   const [loading, setLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   // Poll for new events every 4 seconds
   useEffect(() => {
+    setMounted(true);
     let active = true;
     const interval = setInterval(async () => {
       try {
@@ -76,7 +78,7 @@ export default function RecentEventsList({ initialEvents }: RecentEventsListProp
                         {summary.title}
                       </span>
                       <span className="log-meta" style={{ fontSize: "0.82rem" }}>
-                        {summary.description} · by <strong>{summary.author}</strong> · {new Date(event.receivedAt).toLocaleTimeString()}
+                        {summary.description} · by <strong>{summary.author}</strong> · {mounted ? new Date(event.receivedAt).toLocaleTimeString() : ""}
                       </span>
                     </div>
                     <span className="badge muted" suppressHydrationWarning>{event.actions.length} actions</span>
