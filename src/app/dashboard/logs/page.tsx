@@ -4,6 +4,7 @@ import { authOptions } from "@/server/auth";
 import { prisma } from "@/server/prisma";
 import { getEventSummary } from "@/server/rules";
 import Link from "next/link";
+import EventDetailsExpanded from "@/components/event-details-expanded";
 
 export const dynamic = "force-dynamic";
 
@@ -78,44 +79,25 @@ export default async function LogsPage() {
               }
 
               return (
-                <li className="log-card" key={event.id} style={{ display: "flex", flexDirection: "column", alignItems: "stretch", gap: 12 }}>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "space-between", alignItems: "center" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <strong style={{ fontSize: "1.1rem" }}>{event.repo.owner}/{event.repo.name}</strong>
-                      <span className="badge" style={{ textTransform: "capitalize", padding: "2px 8px" }}>{summary.typeLabel}</span>
-                    </div>
-                    <span className={`badge ${statusClass}`} style={{ fontWeight: "bold" }}>{statusLabel}</span>
-                  </div>
-                  
-                  <div className="stack" style={{ gap: 6 }}>
-                    <div style={{ fontSize: "1.05rem", fontWeight: 600 }}>{summary.title}</div>
-                    <div className="log-meta">
-                      {summary.description} · by <strong>{summary.author}</strong> · {event.receivedAt.toLocaleString()}
-                    </div>
-                  </div>
-
-                  {event.actions.length > 0 ? (
-                    <div style={{ background: "rgba(0,0,0,0.02)", padding: "12px", borderRadius: "8px", border: "1px solid var(--panel-border)", marginTop: 6 }}>
-                      <strong style={{ fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: "0.5px", color: "var(--text-muted)", display: "block", marginBottom: 8 }}>Executed Actions:</strong>
-                      <ul className="stack" style={{ gap: 8, paddingLeft: 16 }}>
-                        {event.actions.map((act) => (
-                          <li key={act.id} style={{ listStyleType: "square", fontSize: "0.9rem" }}>
-                            <code>{act.actionType}</code>: <span className={`badge ${act.status === "success" ? "success" : act.status === "failed" ? "warn" : "muted"}`} style={{ padding: "1px 6px", fontSize: "11px", marginLeft: 6 }}>{act.status}</span>
-                            {act.attempts > 1 && <span className="muted" style={{ fontSize: "0.8rem", marginLeft: 8 }}>(Attempts: {act.attempts})</span>}
-                            {act.error && (
-                              <div style={{ color: "var(--danger)", background: "var(--danger-bg)", padding: "8px 12px", borderRadius: "6px", border: "1px solid rgba(229, 72, 77, 0.12)", fontSize: "0.82rem", fontFamily: "var(--font-mono)", marginTop: 4 }}>
-                                {act.error}
-                              </div>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : (
-                    <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", fontStyle: "italic", background: "rgba(0,0,0,0.01)", padding: "8px 12px", borderRadius: "6px", border: "1px dotted var(--panel-border)" }}>
-                      No rules matched this event. No write-back actions or Slack notifications were triggered.
-                    </div>
-                  )}
+                <li key={event.id} style={{ listStyle: "none" }}>
+                  <details className="event-details" style={{ width: "100%" }}>
+                    <summary className="log-card" suppressHydrationWarning style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div className="stack" style={{ gap: 6 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <strong>{event.repo.owner}/{event.repo.name}</strong>
+                          <span className="badge" style={{ textTransform: "capitalize", padding: "2px 8px" }}>{summary.typeLabel}</span>
+                        </div>
+                        <span className="log-meta" style={{ fontWeight: "600", fontSize: "0.95rem" }}>
+                          {summary.title}
+                        </span>
+                        <span className="log-meta" style={{ fontSize: "0.82rem" }}>
+                          {summary.description} · by <strong>{summary.author}</strong> · {event.receivedAt.toLocaleString()}
+                        </span>
+                      </div>
+                      <span className={`badge ${statusClass}`} style={{ fontWeight: "bold" }}>{statusLabel}</span>
+                    </summary>
+                    <EventDetailsExpanded event={event} />
+                  </details>
                 </li>
               );
             })

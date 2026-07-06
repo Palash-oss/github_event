@@ -6,6 +6,7 @@ import { authOptions } from "@/server/auth";
 import { prisma } from "@/server/prisma";
 import AvailableRepos from "@/components/available-repos";
 import { getEventSummary } from "@/server/rules";
+import EventDetailsExpanded from "@/components/event-details-expanded";
 
 export const dynamic = "force-dynamic";
 
@@ -147,31 +148,7 @@ export default async function DashboardPage() {
                         </div>
                         <span className="badge muted" suppressHydrationWarning>{event.actions.length} actions</span>
                       </summary>
-                      <div className="event-expanded-content" style={{ marginTop: 12, padding: "20px", background: "rgba(28, 27, 25, 0.03)", borderRadius: 12, border: "1px solid var(--panel-border)", fontSize: "0.9rem" }}>
-                        <div className="stack" style={{ gap: 16 }}>
-                          <div>
-                            <strong style={{ display: "block", marginBottom: 8 }}>Action Execution Log:</strong>
-                            {event.actions.length === 0 ? (
-                              <span className="muted">No actions were matched or executed.</span>
-                            ) : (
-                              <ul className="stack" style={{ gap: 8, paddingLeft: 20 }}>
-                                {event.actions.map((act) => (
-                                  <li key={act.id} style={{ listStyleType: "square" }}>
-                                    <code>{act.actionType}</code>: <span style={{ color: act.status === "success" ? "var(--success, #34c759)" : "var(--danger, #ff3b30)", fontWeight: "bold" }}>{act.status}</span>
-                                    {act.error && <code style={{ display: "block", color: "var(--danger, #ff3b30)", marginTop: 4, background: "rgba(255,59,48,0.05)", padding: "6px 12px", borderRadius: 6 }}>Error: {act.error}</code>}
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
-                          </div>
-                          <div>
-                            <strong style={{ display: "block", marginBottom: 8 }}>Raw Webhook Payload:</strong>
-                            <pre style={{ margin: 0, padding: 16, background: "var(--bg)", border: "1px solid var(--panel-border)", borderRadius: 8, overflow: "auto", maxHeight: "250px", fontSize: "0.82rem" }}>
-                              <code>{JSON.stringify(event.payload, null, 2)}</code>
-                            </pre>
-                          </div>
-                        </div>
-                      </div>
+                      <EventDetailsExpanded event={event} />
                     </details>
                   </li>
                 );

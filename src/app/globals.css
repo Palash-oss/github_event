@@ -903,3 +903,73 @@ summary.log-card {
   cursor: pointer;
   outline: none;
 }
+
+/* Fix UI overflowing when expanding webhooks */
+details.event-details {
+  max-width: 100%;
+}
+
+.event-expanded-content {
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.event-expanded-content pre {
+  max-width: 100%;
+  white-space: pre-wrap !important;
+  word-break: break-all !important;
+  overflow-x: auto;
+}
+
+/* Styled lists for modified files and commits */
+.file-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0;
+  margin: 8px 0;
+  list-style: none;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+.file-badge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.file-badge.added {
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1px solid rgba(48, 164, 108, 0.15);
+}
+
+.file-badge.modified {
+  background: rgba(224, 134, 0, 0.08);
+  color: #E08600;
+  border: 1px solid rgba(224, 134, 0, 0.15);
+}
+
+.file-badge.removed {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border: 1px solid rgba(229, 72, 77, 0.15);
+}
+
+.commit-item {
+  padding: 10px;
+  background: var(--bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+}
