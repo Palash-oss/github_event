@@ -26,7 +26,8 @@ export default function RulesForm({ connectedRepos }: RulesFormProps) {
     return [
       { value: "title", label: "title" },
       { value: "body", label: "body text" },
-      { value: "author", label: "author username" }
+      { value: "author", label: "author username" },
+      { value: "action", label: "action (opened / closed / labeled)" }
     ];
   };
 
@@ -82,7 +83,15 @@ export default function RulesForm({ connectedRepos }: RulesFormProps) {
         
         <label>
           Match value
-          <input name="matchValue" placeholder={eventType === "push" ? "release" : "bug"} required suppressHydrationWarning />
+          <input 
+            name="matchValue" 
+            placeholder={
+              eventType === "push" ? "release" 
+              : "bug / closed / opened / Palash-oss"
+            } 
+            required 
+            suppressHydrationWarning 
+          />
         </label>
         
         <label style={{ opacity: eventType === "push" ? 0.5 : 1 }}>

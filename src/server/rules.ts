@@ -54,6 +54,7 @@ export function getPayloadValue(payload: WebhookPayload, field: string): string 
       payload.head_commit?.author?.username
     );
   }
+  if (field === "action") return stringValue(payload.action);
   if (field === "message") return stringValue(payload.head_commit?.message ?? payload.commits?.[0]?.message);
   if (field === "ref") return stringValue(payload.ref);
   return "";
