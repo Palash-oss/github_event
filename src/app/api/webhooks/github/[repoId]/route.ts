@@ -2,6 +2,7 @@ import { createHmac, timingSafeEqual } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/server/prisma";
 import { processEvent } from "@/server/process-event";
+import { checkRateLimit } from "@/server/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -14,7 +15,21 @@ type WebhookPayload = {
   };
 };
 
-export async function POST(request: NextRequest) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { repoId: string } }
+) {
+  const repoId = params.repoId;
+  if (!repoId) {
+    return NextResponse.json({ error: "Missing repository ID in route" }, { status: 400 });
+  }
+
+  // Rate Limiting per repoId (100 requests per minute)
+  const rateLimitResult = checkRateLimit(repoId, 100, 60000);
+  if (!rateLimitResult.success) {
+    return NextResponse.json({ error: "Rate limit exceeded for this repository" }, { status: 429 });
+  }
+
   const deliveryId = request.headers.get("x-github-delivery");
   const signature = request.headers.get("x-hub-signature-256");
   const eventType = request.headers.get("x-github-event") ?? "unknown";
@@ -31,17 +46,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
   }
 
-  const repoInfo = payload.repository?.full_name ?? buildRepoFullName(payload);
-  if (!repoInfo) {
-    return NextResponse.json({ error: "Missing repository information" }, { status: 400 });
-  }
-
-  const [owner, name] = repoInfo.split("/");
-  const matchingRepos = await prisma.repo.findMany({
+  const repo = await prisma.repo.findUnique({
     where: {
-      owner,
-      name,
-      active: true
+      id: repoId
     },
     include: {
       user: true,
@@ -49,17 +56,12 @@ export async function POST(request: NextRequest) {
     }
   });
 
-  if (matchingRepos.length === 0) {
-    return NextResponse.json({ error: "Repository not connected" }, { status: 404 });
+  if (!repo || !repo.active) {
+    return NextResponse.json({ error: "Repository not connected or inactive" }, { status: 404 });
   }
 
-  // Find the specific tenant repo whose webhookSecret matches the HMAC signature
-  const repo = matchingRepos.find((r) => {
-    const expectedSignature = `sha256=${createHmac("sha256", r.webhookSecret).update(bodyText).digest("hex")}`;
-    return compareSignatures(signature, expectedSignature);
-  });
-
-  if (!repo) {
+  const expectedSignature = `sha256=${createHmac("sha256", repo.webhookSecret).update(bodyText).digest("hex")}`;
+  if (!compareSignatures(signature, expectedSignature)) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
@@ -99,18 +101,15 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({ ok: true });
 }
 
-function compareSignatures(received: string, expected: string) {
-  const receivedBuffer = Buffer.from(received);
-  const expectedBuffer = Buffer.from(expected);
-  if (receivedBuffer.length !== expectedBuffer.length) return false;
-  return timingSafeEqual(receivedBuffer, expectedBuffer);
-}
-
-function buildRepoFullName(payload: WebhookPayload) {
-  const owner = payload.repository?.owner?.login;
-  const name = payload.repository?.name;
-  if (!owner || !name) return null;
-  return `${owner}/${name}`;
+export function compareSignatures(received: string, expected: string): boolean {
+  try {
+    const receivedBuffer = Buffer.from(received);
+    const expectedBuffer = Buffer.from(expected);
+    if (receivedBuffer.length !== expectedBuffer.length) return false;
+    return timingSafeEqual(receivedBuffer, expectedBuffer);
+  } catch {
+    return false;
+  }
 }
 
 function isUniqueConstraintError(error: unknown) {

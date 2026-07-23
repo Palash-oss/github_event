@@ -84,16 +84,9 @@ export async function POST(request: NextRequest) {
     }
   });
 
-  const webhookId = await createOrUpdateWebhook({
-    accessToken: user.accessToken,
-    owner,
-    repo: name,
-    secret,
-    appUrl: getAppUrl(request.url),
-    webhookId: existingRepo?.webhookId
-  });
+  const repoSecret = existingRepo?.webhookSecret ?? secret;
 
-  await prisma.repo.upsert({
+  const repo = await prisma.repo.upsert({
     where: {
       userId_owner_name: {
         userId: user.id,
@@ -102,19 +95,34 @@ export async function POST(request: NextRequest) {
       }
     },
     update: {
-      webhookId,
-      webhookSecret: secret,
+      webhookSecret: repoSecret,
       active: true
     },
     create: {
       userId: user.id,
       owner,
       name,
-      webhookId,
-      webhookSecret: secret,
+      webhookSecret: repoSecret,
       active: true
     }
   });
+
+  const webhookId = await createOrUpdateWebhook({
+    accessToken: user.accessToken,
+    owner,
+    repo: name,
+    repoId: repo.id,
+    secret: repoSecret,
+    appUrl: getAppUrl(request.url),
+    webhookId: repo.webhookId
+  });
+
+  if (webhookId !== repo.webhookId) {
+    await prisma.repo.update({
+      where: { id: repo.id },
+      data: { webhookId }
+    });
+  }
 
   return NextResponse.redirect(new URL("/dashboard", request.url), 303);
 }

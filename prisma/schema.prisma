@@ -42,19 +42,24 @@ model Rule {
   actionLabel   String?
   actionComment String?
   notifySlack   Boolean  @default(true)
+  notifyDiscord Boolean  @default(false)
+  notifyTelegram Boolean @default(false)
   createdAt     DateTime @default(now())
 }
 
 model Event {
-  id         String      @id @default(cuid())
-  deliveryId String      @unique
-  repoId     String
-  repo       Repo        @relation(fields: [repoId], references: [id])
-  eventType  String
-  action     String?
-  payload    Json
-  receivedAt DateTime    @default(now())
-  actions    ActionLog[]
+  id               String      @id @default(cuid())
+  deliveryId       String      @unique
+  repoId           String
+  repo             Repo        @relation(fields: [repoId], references: [id])
+  eventType        String
+  action           String?
+  payload          Json
+  aiSummary        String?
+  aiPriority       String?
+  aiSuggestedLabel String?
+  receivedAt       DateTime    @default(now())
+  actions          ActionLog[]
 }
 
 model ActionLog {

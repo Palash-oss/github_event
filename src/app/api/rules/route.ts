@@ -49,6 +49,8 @@ export async function POST(request: NextRequest) {
   const actionLabel = String(formData.get("actionLabel") ?? "").trim();
   const actionComment = String(formData.get("actionComment") ?? "").trim();
   const notifySlack = String(formData.get("notifySlack") ?? "on") === "on";
+  const notifyDiscord = String(formData.get("notifyDiscord") ?? "") === "on";
+  const notifyTelegram = String(formData.get("notifyTelegram") ?? "") === "on";
 
   if (!matchValue) {
     return NextResponse.json({ error: "matchValue is required" }, { status: 400 });
@@ -63,7 +65,9 @@ export async function POST(request: NextRequest) {
       matchValue,
       actionLabel: actionLabel || null,
       actionComment: actionComment || null,
-      notifySlack
+      notifySlack,
+      notifyDiscord,
+      notifyTelegram
     }
   });
 

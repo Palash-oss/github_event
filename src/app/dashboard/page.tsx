@@ -72,9 +72,12 @@ export default async function DashboardPage() {
           <p className="lede">
             Signed in as <strong>{user.username}</strong>. Connect a repository below to configure the webhook, then watch issues and pull requests flow through the rules engine.
           </p>
-          <div className="actions">
+          <div className="actions" style={{ display: "flex", gap: 12 }}>
             <Link className="button secondary" href="/dashboard/logs">
               Open Logs Archive
+            </Link>
+            <Link className="button primary" href="/dashboard/analytics">
+              📊 Analytics & Metrics
             </Link>
           </div>
         </div>

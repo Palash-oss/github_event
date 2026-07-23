@@ -69,8 +69,55 @@ export default function RulesForm({ connectedRepos }: RulesFormProps) {
     }
   }
 
+  const [matchValue, setMatchValue] = useState("");
+  const [actionLabel, setActionLabel] = useState("");
+  const [actionComment, setActionComment] = useState("");
+
+  const applyPreset = (preset: "bug" | "bot" | "security" | "push") => {
+    if (preset === "bug") {
+      setEventType("issues");
+      setMatchValue("bug");
+      setActionLabel("bug");
+      setActionComment("Thanks for reporting this bug, {{author}}! Our team is investigating.");
+    } else if (preset === "bot") {
+      setEventType("pull_request");
+      setMatchValue("bot");
+      setActionLabel("automated");
+      setActionComment("Automated PR detected from {{author}}.");
+    } else if (preset === "security") {
+      setEventType("issues");
+      setMatchValue("security");
+      setActionLabel("security");
+      setActionComment("🚨 Security issue flagged: {{author}}.");
+    } else if (preset === "push") {
+      setEventType("push");
+      setMatchValue("main");
+      setActionLabel("");
+      setActionComment("");
+    }
+  };
+
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="stack" style={{ marginBottom: 24 }}>
+      {/* 1-Click Rule Preset Templates */}
+      <div className="stack" style={{ gap: 8 }}>
+        <span className="eyebrow" style={{ fontSize: "0.75rem" }}>⚡ 1-Click Preset Rule Templates</span>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <button type="button" onClick={() => applyPreset("bug")} className="button secondary" style={{ padding: "4px 10px", fontSize: "0.8rem" }}>
+            🐛 Auto-Label Bugs
+          </button>
+          <button type="button" onClick={() => applyPreset("bot")} className="button secondary" style={{ padding: "4px 10px", fontSize: "0.8rem" }}>
+            🤖 Flag Bot PRs
+          </button>
+          <button type="button" onClick={() => applyPreset("security")} className="button secondary" style={{ padding: "4px 10px", fontSize: "0.8rem" }}>
+            🚨 Security Escalation
+          </button>
+          <button type="button" onClick={() => applyPreset("push")} className="button secondary" style={{ padding: "4px 10px", fontSize: "0.8rem" }}>
+            🚀 Main Push Alert
+          </button>
+        </div>
+      </div>
+
       {/* Status banner */}
       {status !== "idle" && (
         <div style={{
@@ -138,6 +185,8 @@ export default function RulesForm({ connectedRepos }: RulesFormProps) {
           Match value
           <input 
             name="matchValue" 
+            value={matchValue}
+            onChange={(e) => setMatchValue(e.target.value)}
             placeholder={
               eventType === "push" ? "release" 
               : "bug / closed / opened / Palash-oss"
@@ -151,6 +200,8 @@ export default function RulesForm({ connectedRepos }: RulesFormProps) {
           Action label
           <input 
             name="actionLabel" 
+            value={actionLabel}
+            onChange={(e) => setActionLabel(e.target.value)}
             placeholder={eventType === "push" ? "Not applicable" : "bug"} 
             disabled={eventType === "push"}
             suppressHydrationWarning 
@@ -161,6 +212,8 @@ export default function RulesForm({ connectedRepos }: RulesFormProps) {
           Action comment template
           <input 
             name="actionComment" 
+            value={actionComment}
+            onChange={(e) => setActionComment(e.target.value)}
             placeholder={eventType === "push" ? "Not applicable for push events" : "Thanks for the report, {{author}}"} 
             disabled={eventType === "push"}
             suppressHydrationWarning 
@@ -170,7 +223,7 @@ export default function RulesForm({ connectedRepos }: RulesFormProps) {
 
       {eventType === "push" && (
         <div style={{ fontSize: "0.82rem", color: "var(--muted)", fontStyle: "italic", background: "rgba(0,0,0,0.01)", padding: "10px 14px", borderRadius: "8px", border: "1px dotted var(--panel-border)", marginTop: -8 }}>
-          ℹ️ <strong>Note</strong>: Push events only support Slack notifications (write-back labels and comments will be skipped because push commits are not tied to a single issue/PR).
+          ℹ️ <strong>Note</strong>: Push events only support notifications (write-back labels and comments will be skipped because push commits are not tied to a single issue/PR).
         </div>
       )}
 
@@ -180,12 +233,22 @@ export default function RulesForm({ connectedRepos }: RulesFormProps) {
         </div>
       )}
 
-      <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", width: "fit-content", marginTop: 8 }}>
-        <input type="checkbox" name="notifySlack" defaultChecked suppressHydrationWarning />
-        <span>Notify Slack webhook channel</span>
-      </label>
+      <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginTop: 8 }}>
+        <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+          <input type="checkbox" name="notifySlack" defaultChecked suppressHydrationWarning />
+          <span>Slack</span>
+        </label>
+        <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+          <input type="checkbox" name="notifyDiscord" suppressHydrationWarning />
+          <span>Discord</span>
+        </label>
+        <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+          <input type="checkbox" name="notifyTelegram" suppressHydrationWarning />
+          <span>Telegram</span>
+        </label>
+      </div>
 
-      <button type="submit" className="btn" disabled={status === "saving"} style={{ opacity: status === "saving" ? 0.6 : 1, cursor: status === "saving" ? "not-allowed" : "pointer" }}>
+      <button type="submit" className="button primary" disabled={status === "saving"} style={{ opacity: status === "saving" ? 0.6 : 1, cursor: status === "saving" ? "not-allowed" : "pointer", marginTop: 12 }}>
         {status === "saving" ? "Saving…" : "Save rule"}
       </button>
     </form>

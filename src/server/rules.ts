@@ -13,15 +13,15 @@ type WebhookPayload = {
   ref?: string;
   zen?: string;
   commits?: Array<{
-    message: string;
-    author: { name: string; username?: string };
+    message?: string;
+    author?: { name?: string; username?: string };
     modified?: string[];
     added?: string[];
     removed?: string[];
   }>;
   head_commit?: {
-    message: string;
-    author: { username: string; name: string };
+    message?: string;
+    author?: { username?: string; name?: string };
   };
   pusher?: { name: string; email: string };
   issue?: {

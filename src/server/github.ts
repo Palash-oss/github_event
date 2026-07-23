@@ -30,13 +30,14 @@ export async function createOrUpdateWebhook(params: {
   accessToken: string;
   owner: string;
   repo: string;
+  repoId: string;
   secret: string;
   appUrl: string;
   webhookId?: number | null;
 }) {
   const octokit = createOctokit(params.accessToken);
   const config = {
-    url: `${params.appUrl.replace(/\/$/, "")}/api/webhooks/github`,
+    url: `${params.appUrl.replace(/\/$/, "")}/api/webhooks/github/${params.repoId}`,
     content_type: "json" as const,
     secret: params.secret,
     insecure_ssl: "0" as const
