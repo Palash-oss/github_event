@@ -42,8 +42,7 @@ export function buildSlackBlockKitMessage(
         type: "header",
         text: {
           type: "plain_text",
-          text: `🚀 New Push to ${repoFullName}`,
-          emoji: true
+          text: `Push Event: ${repoFullName}`
         }
       },
       {
@@ -67,8 +66,7 @@ export function buildSlackBlockKitMessage(
             type: "button",
             text: {
               type: "plain_text",
-              text: "View Repository",
-              emoji: true
+              text: "View Repository"
             },
             url: repoUrl,
             action_id: "view_repo"
@@ -90,8 +88,7 @@ export function buildSlackBlockKitMessage(
         type: "header",
         text: {
           type: "plain_text",
-          text: `⚠️ Issue ${action.charAt(0).toUpperCase() + action.slice(1)}`,
-          emoji: true
+          text: `Issue Event: ${action.charAt(0).toUpperCase() + action.slice(1)}`
         }
       },
       {
@@ -112,8 +109,7 @@ export function buildSlackBlockKitMessage(
             type: "button",
             text: {
               type: "plain_text",
-              text: "View on GitHub",
-              emoji: true
+              text: "View on GitHub"
             },
             url: htmlUrl,
             action_id: "view_issue_github"
@@ -122,8 +118,7 @@ export function buildSlackBlockKitMessage(
             type: "button",
             text: {
               type: "plain_text",
-              text: "Close Issue",
-              emoji: true
+              text: "Close Issue"
             },
             style: "danger",
             action_id: "close_issue",
@@ -148,15 +143,14 @@ export function buildSlackBlockKitMessage(
         type: "header",
         text: {
           type: "plain_text",
-          text: `🔀 Pull Request ${action.charAt(0).toUpperCase() + action.slice(1)}`,
-          emoji: true
+          text: `Pull Request: ${action.charAt(0).toUpperCase() + action.slice(1)}`
         }
       },
       {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `*Repository:* ${repoFullName}\n*PR:* <${htmlUrl}|#${number} ${title}>\n*Author:* ${author}\n*Merge:* \`${sourceBranch}\` ➜ \`${targetBranch}\``
+          text: `*Repository:* ${repoFullName}\n*PR:* <${htmlUrl}|#${number} ${title}>\n*Author:* ${author}\n*Merge:* \`${sourceBranch}\` -> \`${targetBranch}\``
         }
       },
       {
@@ -166,8 +160,7 @@ export function buildSlackBlockKitMessage(
             type: "button",
             text: {
               type: "plain_text",
-              text: "View Pull Request",
-              emoji: true
+              text: "View Pull Request"
             },
             url: htmlUrl,
             action_id: "view_pr_github"
@@ -182,7 +175,7 @@ export function buildSlackBlockKitMessage(
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `📢 *GitHub ${eventType} Event*\nRepository: ${repoFullName}\nAction details: \`${payload.action ?? "None"}\``
+        text: `*GitHub ${eventType} Event*\nRepository: ${repoFullName}\nAction details: \`${payload.action ?? "None"}\``
       }
     });
   }

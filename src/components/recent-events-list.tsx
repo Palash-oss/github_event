@@ -102,7 +102,7 @@ export default function RecentEventsList({ initialEvents }: RecentEventsListProp
             className="button secondary"
             style={{ padding: "4px 10px", fontSize: "0.78rem" }}
           >
-            {isSimulating ? "Simulating..." : "⚡ Trigger Test Webhook"}
+            {isSimulating ? "Simulating..." : "Trigger Test Webhook"}
           </button>
           <span className="badge success" style={{ fontSize: "10px", padding: "2px 6px" }}>
             {sseActive ? "SSE Live Stream" : "Polling Stream"}
@@ -142,8 +142,8 @@ export default function RecentEventsList({ initialEvents }: RecentEventsListProp
                         {summary.title}
                       </span>
                       {event.aiSummary && (
-                        <span style={{ fontSize: "0.85rem", color: "var(--text)", fontStyle: "italic", background: "rgba(255,255,255,0.03)", padding: "4px 8px", borderRadius: "6px", width: "fit-content" }}>
-                          🤖 {event.aiSummary}
+                        <span style={{ fontSize: "0.85rem", color: "var(--text)", background: "rgba(255,255,255,0.05)", padding: "4px 8px", borderRadius: "6px", width: "fit-content" }}>
+                          <strong>AI Summary:</strong> {event.aiSummary}
                         </span>
                       )}
                       <span className="log-meta" style={{ fontSize: "0.82rem" }}>
@@ -162,7 +162,7 @@ export default function RecentEventsList({ initialEvents }: RecentEventsListProp
                         className="button secondary"
                         style={{ padding: "3px 8px", fontSize: "0.75rem" }}
                       >
-                        🔄 Re-run Rules
+                        Re-run Rules
                       </button>
                     </div>
                     <div style={{ marginTop: 8 }}>

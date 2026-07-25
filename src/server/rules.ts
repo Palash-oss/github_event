@@ -12,6 +12,7 @@ type WebhookPayload = {
   action?: string;
   ref?: string;
   zen?: string;
+  aiPriority?: string;
   commits?: Array<{
     message?: string;
     author?: { name?: string; username?: string };
@@ -42,7 +43,8 @@ type WebhookPayload = {
   };
 };
 
-export function getPayloadValue(payload: WebhookPayload, field: string): string {
+export function getPayloadValue(payload: WebhookPayload, field: string, aiPriority?: string): string {
+  if (field === "ai_priority") return stringValue(aiPriority || payload.aiPriority);
   if (field === "title") return stringValue(payload.issue?.title ?? payload.pull_request?.title);
   if (field === "body") return stringValue(payload.issue?.body ?? payload.pull_request?.body);
   if (field === "author") {
@@ -57,16 +59,100 @@ export function getPayloadValue(payload: WebhookPayload, field: string): string 
   if (field === "action") return stringValue(payload.action);
   if (field === "message") return stringValue(payload.head_commit?.message ?? payload.commits?.[0]?.message);
   if (field === "ref") return stringValue(payload.ref);
+  if (field === "modified_files") {
+    const files: string[] = [];
+    if (payload.commits) {
+      for (const c of payload.commits) {
+        if (c.modified) files.push(...c.modified);
+        if (c.added) files.push(...c.added);
+        if (c.removed) files.push(...c.removed);
+      }
+    }
+    return Array.from(new Set(files)).join(" ");
+  }
   return "";
 }
 
-export function matchesRule(rule: RuleShape, eventType: string, payload: WebhookPayload): boolean {
+export function matchesRule(
+  rule: RuleShape,
+  eventType: string,
+  payload: WebhookPayload,
+  aiPriority?: string,
+  prFiles?: string[]
+): boolean {
   if (rule.eventType !== eventType) return false;
-  const value = getPayloadValue(payload, rule.matchField);
-  const comparison = rule.matchType === "equals"
-    ? value.trim().toLowerCase() === rule.matchValue.trim().toLowerCase()
-    : value.toLowerCase().includes(rule.matchValue.toLowerCase());
-  return comparison;
+
+  if (rule.matchField === "changed_files_match") {
+    let files = prFiles;
+    if (!files || files.length === 0) {
+      const filesStr = getPayloadValue(payload, "modified_files");
+      files = filesStr ? filesStr.split(" ").filter(Boolean) : [];
+    }
+    return matchesChangedFiles(rule.matchValue, files);
+  }
+
+  const value = getPayloadValue(payload, rule.matchField, aiPriority);
+
+  if (rule.matchType === "equals") {
+    return value.trim().toLowerCase() === rule.matchValue.trim().toLowerCase();
+  }
+
+  if (rule.matchType === "contains") {
+    return value.toLowerCase().includes(rule.matchValue.trim().toLowerCase());
+  }
+
+  if (rule.matchType === "regex") {
+    try {
+      const regex = new RegExp(rule.matchValue.trim(), "i");
+      return regex.test(value);
+    } catch {
+      // Return false safely if user inputs invalid regex syntax
+      return false;
+    }
+  }
+
+  if (rule.matchType === "glob_match") {
+    const filesList = rule.matchField === "modified_files" 
+      ? value.split(" ").filter(Boolean)
+      : [value];
+
+    if (filesList.length === 0) return false;
+
+    return filesList.some((filePath) => matchGlob(rule.matchValue.trim(), filePath));
+  }
+
+  return false;
+}
+
+export function matchesChangedFiles(pattern: string, filePaths: string[]): boolean {
+  if (!pattern || !filePaths || filePaths.length === 0) return false;
+  return filePaths.some((filePath) => matchGlob(pattern.trim(), filePath));
+}
+
+export function matchGlob(pattern: string, filePath: string): boolean {
+  try {
+    const p = pattern.trim().toLowerCase();
+    const f = filePath.trim().toLowerCase();
+
+    if (p === f) return true;
+
+    // Handle extension globs like *.ts, *.prisma across any subdirectory
+    if (p.startsWith("*.") && !p.includes("/")) {
+      const ext = p.slice(1);
+      return f.endsWith(ext);
+    }
+
+    const regexString = "^" + p
+      .replace(/[.+^${}()|[\]\\]/g, "\\$&")
+      .replace(/\*\*/g, ".*")
+      .replace(/(?<!\.)\*/g, ".*")
+      + "$";
+
+    const regex = new RegExp(regexString, "i");
+    return regex.test(f) || f.includes(p.replace(/\*/g, ""));
+  } catch {
+    return false;
+  }
 }
 
 export function isBugFallback(eventType: string, payload: WebhookPayload): boolean {

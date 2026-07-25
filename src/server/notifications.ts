@@ -15,7 +15,7 @@ export async function sendMultiChannelNotifications(params: {
 
   const title = getEventTitle(params.eventType, params.payload);
   const priorityBadge = params.aiPriority ? `[${params.aiPriority}] ` : "";
-  const summaryText = params.aiSummary ? `\n🤖 AI Summary: ${params.aiSummary}` : "";
+  const summaryText = params.aiSummary ? `\nAI Summary: ${params.aiSummary}` : "";
 
   // 1. Slack
   if (params.notifySlack) {
@@ -26,7 +26,7 @@ export async function sendMultiChannelNotifications(params: {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `*${priorityBadge}🤖 AI Triage Summary:* ${params.aiSummary}`
+            text: `*${priorityBadge}AI Triage Summary:* ${params.aiSummary}`
           }
         });
       }
@@ -75,7 +75,7 @@ export async function sendMultiChannelNotifications(params: {
       results.push({ channel: "telegram", status: "failed", error: "TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID missing" });
     } else {
       try {
-        const text = `🔔 *${priorityBadge}${params.owner}/${params.repo}*\nEvent: \`${params.eventType}\`\n\n*${title}*${summaryText}`;
+        const text = `*${priorityBadge}${params.owner}/${params.repo}*\nEvent: \`${params.eventType}\`\n\n*${title}*${summaryText}`;
         await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },

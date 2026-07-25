@@ -1,37 +1,39 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
   
-  /* Primary Palettes */
-  --bg: #FAF9F6;              /* Premium Cream White */
-  --bg-soft: #F2EFE8;         /* Warm Oatmeal Beige */
-  --panel: rgba(255, 255, 255, 0.88); /* Frosted Cream Glass */
-  --panel-border: rgba(28, 27, 25, 0.08); /* Subtle warm gray border */
-  --panel-border-hover: rgba(28, 27, 25, 0.2);
+  /* Primary Palettes - Sleek Midnight Obsidian */
+  --bg: #090C15;              /* Deep Obsidian Black */
+  --bg-soft: #0F172A;         /* Frosted Dark Slate */
+  --panel: rgba(15, 23, 42, 0.85); /* Frosted Dark Glass */
+  --panel-border: rgba(255, 255, 255, 0.18); /* Crisp high-visibility white border */
+  --panel-border-hover: #FFFFFF; /* Pure bright white border on hover */
   
   /* Typography & Text */
-  --text: #1C1B18;            /* Warm Dark Charcoal */
-  --muted: #7E7C74;           /* Soft Taupe/Warm Gray */
+  --text: #FFFFFF;            /* Pure Bright White */
+  --muted: #CBD5E1;           /* Crisp High-Visibility Silver White */
   
   /* Accents & States */
-  --accent: #D7FF00;          /* Electric Neon Yellow */
-  --accent-glow: rgba(215, 255, 0, 0.35);
-  --accent-dark: #B5D600;     /* Readable Neon Yellow-Green for text */
-  --dark-block: #121210;      /* Dark Charcoal contrast background for neon text */
-  --dark-border: rgba(255, 255, 255, 0.1);
-  --dark-text: #F3F1EA;
-  --dark-muted: #8E8D87;
+  --accent: #FFFFFF;          /* Pure White Accent */
+  --accent-glow: rgba(255, 255, 255, 0.35);
+  --accent-dark: #818CF8;
+  --dark-block: #0F172A;
+  --dark-border: rgba(255, 255, 255, 0.2);
+  --dark-text: #FFFFFF;
+  --dark-muted: #94A3B8;
   
   /* System colors */
-  --danger: #E5484D;          /* Sophisticated Red */
-  --danger-bg: rgba(229, 72, 77, 0.08);
-  --success: #30A46C;         /* Premium Sage Green */
-  --success-bg: rgba(48, 164, 108, 0.08);
+  --danger: #F43F5E;          /* Crimson Red */
+  --danger-bg: rgba(244, 63, 94, 0.12);
+  --success: #10B981;         /* Emerald Green */
+  --success-bg: rgba(16, 185, 129, 0.12);
+  --warn: #F59E0B;            /* Amber Orange */
+  --warn-bg: rgba(245, 158, 11, 0.12);
   
   /* Design Tokens */
-  --shadow: 0 16px 40px rgba(28, 27, 25, 0.04), 0 2px 8px rgba(28, 27, 25, 0.02);
-  --shadow-hover: 0 24px 60px rgba(28, 27, 25, 0.08), 0 4px 16px rgba(28, 27, 25, 0.03);
+  --shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
+  --shadow-hover: 0 24px 60px rgba(99, 102, 241, 0.25), 0 4px 16px rgba(0, 0, 0, 0.3);
   --radius: 20px;
   --radius-sm: 12px;
   --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -45,12 +47,20 @@
   box-sizing: border-box;
 }
 
-html {
+html, body {
   min-height: 100%;
-  background: 
-    radial-gradient(circle at 10% 20%, rgba(215, 255, 0, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(242, 239, 232, 0.6) 0%, transparent 50%),
-    linear-gradient(180deg, #FAF9F6 0%, #F5F3EC 100%);
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+html {
+  background-color: #090C15;
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.15) 0%, transparent 45%),
+    radial-gradient(circle at 85% 75%, rgba(16, 185, 129, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 60%),
+    linear-gradient(180deg, #090C15 0%, #07090F 100%);
   background-attachment: fixed;
   scroll-behavior: smooth;
 }
@@ -152,15 +162,15 @@ textarea {
   width: fit-content;
   padding: 6px 14px;
   border-radius: 999px;
-  background: var(--dark-block);
-  color: var(--accent);
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  border: 1px solid rgba(215, 255, 0, 0.25);
-  box-shadow: 0 4px 12px rgba(18, 18, 16, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
 }
 
 h1,
@@ -214,28 +224,28 @@ h1 {
 }
 
 .button.primary {
-  background: var(--dark-block);
-  color: var(--accent);
-  border: 1px solid rgba(215, 255, 0, 0.15);
-  box-shadow: 0 4px 16px rgba(18, 18, 16, 0.15);
+  background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.35);
 }
 
 .button.primary:hover {
-  background: var(--text);
-  border-color: var(--accent);
-  box-shadow: 0 0 20px var(--accent-glow), 0 4px 16px rgba(18, 18, 16, 0.15);
+  background: linear-gradient(135deg, #818CF8 0%, #6366F1 100%);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 24px rgba(99, 102, 241, 0.55), 0 4px 16px rgba(0, 0, 0, 0.3);
   transform: translateY(-2px);
 }
 
 .button.secondary {
   border-color: var(--panel-border);
-  background: var(--bg-soft);
+  background: rgba(255, 255, 255, 0.05);
   color: var(--text);
 }
 
 .button.secondary:hover {
-  background: var(--bg);
-  border-color: var(--text);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
   transform: translateY(-2px);
 }
 
@@ -303,9 +313,9 @@ h1 {
 .list li:hover,
 .repo-card:hover,
 .log-card:hover {
-  background: #FFF;
-  border-color: var(--text);
-  box-shadow: 0 8px 24px rgba(28, 27, 25, 0.05);
+  background: rgba(30, 41, 59, 0.8);
+  border-color: var(--accent);
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.2);
   transform: translateY(-2px);
 }
 
@@ -484,7 +494,7 @@ input[type="checkbox"] {
   color: var(--muted);
 }
 
-/* Hero Art - Premium Neon console display on Dark Charcoal block */
+/* Hero Art - Premium Indigo console display on Dark Charcoal block */
 .hero-art {
   position: relative;
   overflow: hidden;
@@ -492,10 +502,10 @@ input[type="checkbox"] {
   padding: 32px;
   background: var(--dark-block);
   color: var(--dark-text);
-  border: 1px solid rgba(215, 255, 0, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.25);
   box-shadow: 
-    0 24px 64px rgba(18, 18, 16, 0.25),
-    inset 0 0 20px rgba(215, 255, 0, 0.03);
+    0 24px 64px rgba(0, 0, 0, 0.4),
+    inset 0 0 20px rgba(99, 102, 241, 0.05);
   min-height: 260px;
   display: flex;
   flex-direction: column;
@@ -509,7 +519,7 @@ input[type="checkbox"] {
   left: -100px;
   width: 300px;
   height: 300px;
-  background: radial-gradient(circle, rgba(215, 255, 0, 0.08) 0%, transparent 65%);
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 65%);
   pointer-events: none;
 }
 
@@ -727,17 +737,17 @@ html.has-scroll-dragging {
   animation: fade-slide-up-block 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Hover Zoom & Maximize with Neon Glow */
+/* Hover Zoom & Maximize with Pure White Glow */
 .grid-block:hover {
-  transform: scale(1.04) !important; /* Force scale to override entry inline styles */
-  z-index: 10; /* Lifts it above neighboring grid lines */
-  border: 2px solid var(--text) !important; /* Force uniform borders on all 4 sides */
-  outline: 3px solid var(--accent) !important;
-  border-radius: 8px; /* Clean rounded card edges when popped */
+  transform: translateY(-4px) scale(1.03) !important;
+  z-index: 10;
+  border: 1px solid #FFFFFF !important;
+  outline: 2px solid rgba(255, 255, 255, 0.4) !important;
+  border-radius: 12px;
   box-shadow: 
-    0 24px 64px rgba(215, 255, 0, 0.28),
-    0 4px 12px rgba(28, 27, 25, 0.1);
-  background: var(--bg) !important; /* Solid background on hover to mask grid lines behind it */
+    0 24px 64px rgba(255, 255, 255, 0.22),
+    0 4px 16px rgba(0, 0, 0, 0.5);
+  background: rgba(15, 23, 42, 0.95) !important;
 }
 
 .grid-block h2 {
@@ -775,12 +785,19 @@ html.has-scroll-dragging {
   border-bottom-left-radius: calc(var(--radius) - 2px);
 }
 
-.page-grid > .grid-block:last-child {
-  border-bottom-right-radius: calc(var(--radius) - 2px);
+/* Grid Span Helpers */
+.grid-span-2 {
+  grid-column: span 2;
 }
 
-/* Adjust corner radiuses for 2-column tablet layout */
+/* Adjust layout for 2-column tablet layout */
 @media (max-width: 980px) {
+  .page-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .grid-span-2 {
+    grid-column: span 2;
+  }
   .page-grid > .grid-block:first-child {
     border-top-left-radius: calc(var(--radius) - 2px);
     border-top-right-radius: calc(var(--radius) - 2px);
@@ -797,8 +814,17 @@ html.has-scroll-dragging {
   }
 }
 
-/* Adjust corner radiuses for 1-column mobile layout */
+/* Adjust layout for 1-column mobile layout */
 @media (max-width: 640px) {
+  .page-grid {
+    grid-template-columns: 1fr;
+  }
+  .grid-span-2 {
+    grid-column: span 1;
+  }
+  .page-grid > .grid-block {
+    padding: 24px;
+  }
   .page-grid > .grid-block:first-child {
     border-top-left-radius: calc(var(--radius) - 2px);
     border-top-right-radius: calc(var(--radius) - 2px);
@@ -812,11 +838,6 @@ html.has-scroll-dragging {
     border-top-right-radius: 0;
     border-bottom-left-radius: 0;
   }
-}
-
-/* Grid Span Helpers */
-.grid-span-2 {
-  grid-column: span 2;
 }
 
 .grid-span-3 {

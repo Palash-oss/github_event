@@ -193,7 +193,6 @@ export default function EventDetailsExpanded({ event }: EventDetailsExpandedProp
           {event.actions.length === 0 ? (
             <div style={{ background: "rgba(0,0,0,0.02)", border: "1px dashed var(--panel-border)", borderRadius: 10, padding: "16px 20px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                <span style={{ fontSize: "1.2rem" }}>💤</span>
                 <strong style={{ fontSize: "0.92rem" }}>No automation triggered</strong>
               </div>
               <p className="muted" style={{ fontSize: "0.85rem", lineHeight: 1.6, margin: 0 }}>
@@ -201,7 +200,7 @@ export default function EventDetailsExpanded({ event }: EventDetailsExpandedProp
                 The event type was <code style={{ background: "var(--bg)", padding: "1px 6px", borderRadius: 4 }}>{event.eventType}</code>.
               </p>
               <p className="muted" style={{ fontSize: "0.82rem", lineHeight: 1.6, margin: "8px 0 0" }}>
-                ➡ To automate actions for this event, go to your dashboard and add a new rule under <strong>Rules snapshot</strong>.
+                To automate actions for this event, go to your dashboard and add a new rule under <strong>Rules snapshot</strong>.
               </p>
             </div>
           ) : (
@@ -231,9 +230,6 @@ export default function EventDetailsExpanded({ event }: EventDetailsExpandedProp
                   <div key={act.id} style={{ background: isSuccess ? "rgba(48, 164, 108, 0.06)" : isFailed ? "rgba(229, 72, 77, 0.06)" : "rgba(0,0,0,0.02)", border: `1px solid ${isSuccess ? "rgba(48,164,108,0.2)" : isFailed ? "rgba(229,72,77,0.2)" : "var(--panel-border)"}`, borderRadius: 10, padding: "12px 16px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: actionDescription ? 8 : 0 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <span style={{ fontSize: "1rem" }}>
-                          {act.actionType === "github_label" ? "🏷️" : act.actionType === "github_comment" ? "💬" : act.actionType === "slack_notify" ? "📣" : "⚙️"}
-                        </span>
                         <code style={{ fontSize: "0.85rem" }}>{act.actionType}</code>
                       </div>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>

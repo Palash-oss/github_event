@@ -1,5 +1,5 @@
 import { ActionLog, Event, Prisma, Repo, Rule, User } from "@prisma/client";
-import { addIssueComment, addIssueLabels } from "@/server/github";
+import { addIssueComment, addIssueLabels, getPullRequestChangedFiles } from "@/server/github";
 import { prisma } from "@/server/prisma";
 import { buildDefaultRule, getActionMessage, matchesRule, renderTemplate } from "@/server/rules";
 import { sendSlackMessage } from "@/server/slack";
@@ -39,7 +39,30 @@ export async function processEvent(event: EventWithRelations) {
     }
   }
 
-  const rules = event.repo.rules.filter((rule) => matchesRule(rule, eventType, payload));
+  // Fetch PR changed files via Octokit if any PR rule matches on changed_files_match
+  let prFiles: string[] = [];
+  const pullNumber = payload.pull_request?.number;
+  if (eventType === "pull_request" && pullNumber && event.repo.user.accessToken) {
+    const hasChangedFilesRule = event.repo.rules.some(
+      (r) => r.eventType === "pull_request" && r.matchField === "changed_files_match"
+    );
+    if (hasChangedFilesRule) {
+      try {
+        prFiles = await getPullRequestChangedFiles({
+          accessToken: event.repo.user.accessToken,
+          owner: event.repo.owner,
+          repo: event.repo.name,
+          pullNumber
+        });
+      } catch (e) {
+        console.warn("Failed to fetch PR changed files via Octokit:", e);
+      }
+    }
+  }
+
+  const rules = event.repo.rules.filter((rule) =>
+    matchesRule(rule, eventType, payload, aiPriority || undefined, prFiles)
+  );
   const fallbackRule = rules.length > 0 ? null : buildDefaultRule(eventType, payload);
   const activeRules = fallbackRule ? [fallbackRule] : rules;
 

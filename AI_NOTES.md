@@ -16,6 +16,12 @@
    * *Why*: Differentiating transient errors (HTTP 429 rate limit, 500/502/503 server errors) from permanent errors (HTTP 401 Bad Credentials, 403 Forbidden, 404 Not Found). Transient errors use exponential backoff both in-flight and during background retry sweeps (up to 5 attempts). Permanent errors or exhausted retries are tagged as `dead_letter` in `ActionLog` to prevent infinite loops and ensure full observability.
 7. **Sliding-Window Webhook Rate Limiting**:
    * *Why*: Added an in-memory sliding window rate limiter (100 requests per 60 seconds per `repoId`) returning `429 Too Many Requests` to prevent webhook event floods or accidental loops.
+8. **AI Priority, Regex & Glob Pattern Smart Rules**:
+   * *Why*: Basic string matching (`title contains "x"`) is provided for free by GitHub Actions. Adding AI Priority (`ai_priority`), Regular Expressions (`regex`), and Path Wildcards (`glob_match`) enables self-serve capabilities that GitHub Actions cannot do natively without custom YAML scripts—such as auto-escalating AI-triaged `P0` critical issues or watching file pattern changes (`*.prisma`, `src/auth/*`).
+   * *Resilience*: Invalid regex strings input by users are safely handled via `try/catch` blocks in `matchesRule()`, returning `false` rather than crashing the background webhook event processor.
+9. **Codebase-Aware Diff Rule (`changed_files_match`) & Paginated Octokit Fetching**:
+   * *Why*: PR webhook payloads do not include complete file lists for large PRs. We added `getPullRequestChangedFiles()` in `github.ts` using `octokit.paginate(octokit.pulls.listFiles, { per_page: 100 })` to ensure PRs with 100+ files are completely retrieved without missing changed files or breaking memory boundaries.
+   * *Conditional API Fetching*: Octokit changed-files API is called ONLY if a `changed_files_match` rule actually exists for that repository, preserving rate limits and minimizing network overhead.
 
 ## Hardest Bug & Resolution
 * **Timing & Webhook Activation Gap**: The user reported that a commit push and an issue they created did not show up in the logs. After querying the database records and GitHub API webhook delivery logs, we discovered that both events occurred *minutes before* the user finished connecting their repository (which creates the webhook). We resolved this by explaining that webhooks are not retroactive and that the user needed to trigger a new event.

@@ -1,8 +1,9 @@
-import { createHmac, timingSafeEqual } from "crypto";
+import { createHmac } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/server/prisma";
 import { processEvent } from "@/server/process-event";
 import { checkRateLimit } from "@/server/rate-limit";
+import { compareSignatures } from "@/server/webhook-utils";
 
 export const runtime = "nodejs";
 
@@ -99,17 +100,6 @@ export async function POST(
   }
 
   return NextResponse.json({ ok: true });
-}
-
-export function compareSignatures(received: string, expected: string): boolean {
-  try {
-    const receivedBuffer = Buffer.from(received);
-    const expectedBuffer = Buffer.from(expected);
-    if (receivedBuffer.length !== expectedBuffer.length) return false;
-    return timingSafeEqual(receivedBuffer, expectedBuffer);
-  } catch {
-    return false;
-  }
 }
 
 function isUniqueConstraintError(error: unknown) {

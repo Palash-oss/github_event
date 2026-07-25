@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach } from "vitest";
 import { createHmac } from "crypto";
-import { compareSignatures } from "../app/api/webhooks/github/[repoId]/route";
+import { compareSignatures } from "../server/webhook-utils";
 import { checkRateLimit, clearRateLimitStore } from "../server/rate-limit";
 import { isPermanentErrorMessage } from "../server/process-event";
 

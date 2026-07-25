@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
             type: "section",
             text: {
               type: "mrkdwn",
-              text: `✅ *Resolved:* Issue closed from Slack by *@${username}*`
+              text: `*Resolved:* Issue closed from Slack by *@${username}*`
             }
           };
         }
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
       console.error("Failed to close issue via Slack interactive action:", error.message || error);
       // Return ephemeral message or message with warning
       return NextResponse.json({
-        text: `❌ Failed to close issue: ${error.message || "Unknown GitHub error"}`
+        text: `Failed to close issue: ${error.message || "Unknown GitHub error"}`
       });
     }
   }

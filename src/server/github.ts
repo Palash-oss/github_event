@@ -111,3 +111,20 @@ export async function addIssueComment(params: {
     body: params.body
   });
 }
+
+export async function getPullRequestChangedFiles(params: {
+  accessToken: string;
+  owner: string;
+  repo: string;
+  pullNumber: number;
+}): Promise<string[]> {
+  const octokit = createOctokit(params.accessToken);
+  const files = await octokit.paginate(octokit.pulls.listFiles, {
+    owner: params.owner,
+    repo: params.repo,
+    pull_number: params.pullNumber,
+    per_page: 100
+  });
+
+  return files.map((file) => file.filename);
+}

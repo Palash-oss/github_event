@@ -13,6 +13,7 @@ interface RulesFormProps {
 
 export default function RulesForm({ connectedRepos }: RulesFormProps) {
   const [eventType, setEventType] = useState("issues");
+  const [matchType, setMatchType] = useState("contains");
   const [status, setStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
@@ -23,14 +24,20 @@ export default function RulesForm({ connectedRepos }: RulesFormProps) {
       return [
         { value: "message", label: "commit message" },
         { value: "ref", label: "branch (ref)" },
-        { value: "author", label: "committer username" }
+        { value: "author", label: "committer username" },
+        { value: "changed_files_match", label: "changed_files_match (file path glob)" },
+        { value: "modified_files", label: "modified files path" },
+        { value: "ai_priority", label: "AI Priority (P0 / P1 / P2)" }
       ];
     }
     return [
       { value: "title", label: "title" },
       { value: "body", label: "body text" },
       { value: "author", label: "author username" },
-      { value: "action", label: "action (opened / closed / labeled)" }
+      { value: "action", label: "action (opened / closed / labeled)" },
+      { value: "changed_files_match", label: "changed_files_match (file path glob)" },
+      { value: "ai_priority", label: "AI Priority (P0 / P1 / P2)" },
+      { value: "modified_files", label: "modified files path" }
     ];
   };
 
@@ -50,9 +57,8 @@ export default function RulesForm({ connectedRepos }: RulesFormProps) {
 
       if (res.ok) {
         setStatus("success");
-        setMessage("✅ Rule saved! It will now automatically match incoming webhooks.");
+        setMessage("Rule saved successfully! It will now automatically match incoming webhooks.");
         formRef.current?.reset();
-        // Auto-dismiss after 4s and reload to show the new rule
         setTimeout(() => {
           setStatus("idle");
           setMessage("");
@@ -61,11 +67,11 @@ export default function RulesForm({ connectedRepos }: RulesFormProps) {
       } else {
         const data = await res.json().catch(() => ({}));
         setStatus("error");
-        setMessage(`❌ Failed to save rule: ${data.error ?? res.statusText}`);
+        setMessage(`Failed to save rule: ${data.error ?? res.statusText}`);
       }
     } catch (err) {
       setStatus("error");
-      setMessage("❌ Network error — make sure you are signed in and try again.");
+      setMessage("Network error — make sure you are signed in and try again.");
     }
   }
 
@@ -73,47 +79,51 @@ export default function RulesForm({ connectedRepos }: RulesFormProps) {
   const [actionLabel, setActionLabel] = useState("");
   const [actionComment, setActionComment] = useState("");
 
-  const applyPreset = (preset: "bug" | "bot" | "security" | "push") => {
-    if (preset === "bug") {
+  const applyPreset = (preset: "ai_p0" | "regex_jira" | "glob_db" | "bug") => {
+    if (preset === "ai_p0") {
       setEventType("issues");
+      setMatchType("equals");
+      setMatchValue("P0");
+      setActionLabel("urgent-p0");
+      setActionComment("AI Triage assessed this item as P0 Critical. Escalating immediately.");
+    } else if (preset === "regex_jira") {
+      setEventType("issues");
+      setMatchType("regex");
+      setMatchValue("CVE-\\d+|JIRA-\\d+");
+      setActionLabel("security-tracked");
+      setActionComment("Ticket reference detected in issue: {{title}}.");
+    } else if (preset === "glob_db") {
+      setEventType("push");
+      setMatchType("glob_match");
+      setMatchValue("*.prisma");
+      setActionLabel("");
+      setActionComment("");
+    } else if (preset === "bug") {
+      setEventType("issues");
+      setMatchType("contains");
       setMatchValue("bug");
       setActionLabel("bug");
       setActionComment("Thanks for reporting this bug, {{author}}! Our team is investigating.");
-    } else if (preset === "bot") {
-      setEventType("pull_request");
-      setMatchValue("bot");
-      setActionLabel("automated");
-      setActionComment("Automated PR detected from {{author}}.");
-    } else if (preset === "security") {
-      setEventType("issues");
-      setMatchValue("security");
-      setActionLabel("security");
-      setActionComment("🚨 Security issue flagged: {{author}}.");
-    } else if (preset === "push") {
-      setEventType("push");
-      setMatchValue("main");
-      setActionLabel("");
-      setActionComment("");
     }
   };
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="stack" style={{ marginBottom: 24 }}>
-      {/* 1-Click Rule Preset Templates */}
+      {/* 1-Click Preset Rule Templates */}
       <div className="stack" style={{ gap: 8 }}>
-        <span className="eyebrow" style={{ fontSize: "0.75rem" }}>⚡ 1-Click Preset Rule Templates</span>
+        <span className="eyebrow" style={{ fontSize: "0.75rem" }}>Smart Rule Presets</span>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <button type="button" onClick={() => applyPreset("ai_p0")} className="button secondary" style={{ padding: "4px 10px", fontSize: "0.8rem" }}>
+            AI P0 Critical Escalation
+          </button>
+          <button type="button" onClick={() => applyPreset("regex_jira")} className="button secondary" style={{ padding: "4px 10px", fontSize: "0.8rem" }}>
+            Regex Ticket / CVE Pattern
+          </button>
+          <button type="button" onClick={() => applyPreset("glob_db")} className="button secondary" style={{ padding: "4px 10px", fontSize: "0.8rem" }}>
+            Glob DB Schema Watch (*.prisma)
+          </button>
           <button type="button" onClick={() => applyPreset("bug")} className="button secondary" style={{ padding: "4px 10px", fontSize: "0.8rem" }}>
-            🐛 Auto-Label Bugs
-          </button>
-          <button type="button" onClick={() => applyPreset("bot")} className="button secondary" style={{ padding: "4px 10px", fontSize: "0.8rem" }}>
-            🤖 Flag Bot PRs
-          </button>
-          <button type="button" onClick={() => applyPreset("security")} className="button secondary" style={{ padding: "4px 10px", fontSize: "0.8rem" }}>
-            🚨 Security Escalation
-          </button>
-          <button type="button" onClick={() => applyPreset("push")} className="button secondary" style={{ padding: "4px 10px", fontSize: "0.8rem" }}>
-            🚀 Main Push Alert
+            Auto-Label Bugs
           </button>
         </div>
       </div>
@@ -175,9 +185,16 @@ export default function RulesForm({ connectedRepos }: RulesFormProps) {
         
         <label>
           Match type
-          <select name="matchType" defaultValue="contains" suppressHydrationWarning>
-            <option value="contains">contains</option>
-            <option value="equals">equals</option>
+          <select 
+            name="matchType" 
+            value={matchType}
+            onChange={(e) => setMatchType(e.target.value)}
+            suppressHydrationWarning
+          >
+            <option value="contains">contains (substring)</option>
+            <option value="equals">equals (exact)</option>
+            <option value="regex">regex (regular expression)</option>
+            <option value="glob_match">glob_match (wildcard paths)</option>
           </select>
         </label>
         
@@ -188,8 +205,9 @@ export default function RulesForm({ connectedRepos }: RulesFormProps) {
             value={matchValue}
             onChange={(e) => setMatchValue(e.target.value)}
             placeholder={
-              eventType === "push" ? "release" 
-              : "bug / closed / opened / Palash-oss"
+              matchType === "regex" ? "CVE-\\d+|JIRA-\\d+" :
+              matchType === "glob_match" ? "*.prisma or src/auth/*" :
+              "P0 / bug / main"
             } 
             required 
             suppressHydrationWarning 
@@ -202,7 +220,7 @@ export default function RulesForm({ connectedRepos }: RulesFormProps) {
             name="actionLabel" 
             value={actionLabel}
             onChange={(e) => setActionLabel(e.target.value)}
-            placeholder={eventType === "push" ? "Not applicable" : "bug"} 
+            placeholder={eventType === "push" ? "Not applicable" : "urgent-p0"} 
             disabled={eventType === "push"}
             suppressHydrationWarning 
           />
@@ -223,13 +241,13 @@ export default function RulesForm({ connectedRepos }: RulesFormProps) {
 
       {eventType === "push" && (
         <div style={{ fontSize: "0.82rem", color: "var(--muted)", fontStyle: "italic", background: "rgba(0,0,0,0.01)", padding: "10px 14px", borderRadius: "8px", border: "1px dotted var(--panel-border)", marginTop: -8 }}>
-          ℹ️ <strong>Note</strong>: Push events only support notifications (write-back labels and comments will be skipped because push commits are not tied to a single issue/PR).
+          <strong>Note</strong>: Push events trigger Slack notifications (GitHub label/comment write-backs are skipped because pushes are not tied to a single issue/PR).
         </div>
       )}
 
       {eventType !== "push" && (
         <div style={{ fontSize: "0.82rem", color: "var(--muted)", background: "rgba(0,0,0,0.01)", padding: "10px 14px", borderRadius: "8px", border: "1px dotted var(--panel-border)", marginTop: -8 }}>
-          💡 <strong>Tip</strong>: Match field <code>action</code> = <code>closed</code> to trigger actions when a developer resolves an issue. Match field <code>action</code> = <code>opened</code> to trigger when a new issue is reported.
+          <strong>Tip</strong>: Select <strong>AI Priority (P0 / P1 / P2)</strong> to trigger actions based on AI Triage assessment, or select <strong>regex</strong> for pattern matching like <code>CVE-\d+</code>.
         </div>
       )}
 
