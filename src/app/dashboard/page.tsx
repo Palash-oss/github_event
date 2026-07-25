@@ -9,6 +9,7 @@ import { getEventSummary } from "@/lib/event-utils";
 import EventDetailsExpanded from "@/components/event-details-expanded";
 import RulesForm from "@/components/rules-form";
 import RecentEventsList from "@/components/recent-events-list";
+import BillingPanel from "@/components/billing-panel";
 
 export const dynamic = "force-dynamic";
 
@@ -86,6 +87,13 @@ export default async function DashboardPage() {
             </Link>
           </div>
         </div>
+      </section>
+
+      <section>
+        <BillingPanel
+          subscriptionStatus={user.subscriptionStatus || "free"}
+          connectedRepoCount={connectedRepos.length}
+        />
       </section>
 
       <section className="grid-2">

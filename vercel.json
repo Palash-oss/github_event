@@ -1,7 +1,7 @@
 {
   "crons": [
     {
-      "path": "/api/retry-sweep",
+      "path": "/api/cron/stale-prs",
       "schedule": "0 0 * * *"
     }
   ]
