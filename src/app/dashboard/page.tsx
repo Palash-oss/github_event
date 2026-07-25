@@ -127,7 +127,7 @@ export default async function DashboardPage() {
         </div>
       </section>
 
-      <section className="grid-2">
+      <section className="grid-2 grid-rules">
         <RecentEventsList initialEvents={serializedRecentEvents} />
 
         <div className="panel">
@@ -139,7 +139,7 @@ export default async function DashboardPage() {
           <RulesForm connectedRepos={serializedConnectedRepos} />
 
           <div style={{ overflowX: "auto", width: "100%", WebkitOverflowScrolling: "touch" }}>
-            <table className="table" style={{ width: "100%", minWidth: "500px" }}>
+            <table className="table" style={{ width: "100%", minWidth: "400px" }}>
               <thead>
                 <tr>
                   <th>Repo</th>

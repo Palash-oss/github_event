@@ -269,6 +269,10 @@ h1 {
   align-items: start;
 }
 
+.grid-rules {
+  grid-template-columns: 0.75fr 1.25fr;
+}
+
 .panel {
   padding: 36px;
 }
@@ -589,6 +593,10 @@ input[type="checkbox"] {
   .grid-2 {
     grid-template-columns: 1fr;
     gap: 24px;
+  }
+
+  .grid-rules {
+    grid-template-columns: 1fr;
   }
 
   .field-grid {
