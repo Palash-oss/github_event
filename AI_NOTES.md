@@ -22,11 +22,9 @@
 9. **Codebase-Aware Diff Rule (`changed_files_match`) & Paginated Octokit Fetching**:
    * *Why*: PR webhook payloads do not include complete file lists for large PRs. We added `getPullRequestChangedFiles()` in `github.ts` using `octokit.paginate(octokit.pulls.listFiles, { per_page: 100 })` to ensure PRs with 100+ files are completely retrieved without missing changed files or breaking memory boundaries.
    * *Conditional API Fetching*: Octokit changed-files API is called ONLY if a `changed_files_match` rule actually exists for that repository, preserving rate limits and minimizing network overhead.
-10. **Self-Serve Subscription Billing, Feature Gating & Graceful Downgrades**:
-    * *Pricing Model*: Established a 2-tier structure: Free Tier ($0/mo, 1 connected repo, text-matching rules) and Pro Tier ($19/mo, unlimited connected repos, `changed_files_match` diff rules, `ai_priority` triage, `regex`, `glob_match`, and 1-click templates).
-    * *Self-Serve Stripe Integration*: Added Stripe Checkout (`/api/stripe/checkout`) for instant plan upgrades and Stripe Customer Portal (`/api/stripe/portal`) for self-serve cancellation, upgrade/downgrade, and payment method updates.
-    * *Webhook HMAC Verification*: Handled Stripe webhooks (`/api/webhooks/stripe`) with `stripe.webhooks.constructEvent(bodyText, signature, secret)`. Verification failures return `400 Bad Request`. Synchronizes `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`, and `invoice.payment_failed` into DB `User` billing state.
-    * *Graceful Downgrade*: When a subscription cancels, `handleGracefulDowngrade()` marks all Pro-only rules as `disabled: true` and deactivates excess repos beyond 1 without deleting any user rules or configuration data.
+10. **Full Feature Accessibility & Billing Gating Removal**:
+    * *Unlocked Platform*: Removed all Stripe subscription gating and tier limits. All features—including unlimited connected repositories, codebase PR diff rules (`changed_files_match`), AI Triage (`ai_priority`), regular expressions, wildcards, 1-click templates, and multi-channel notifications—are 100% unlocked and freely accessible for all users out of the box.
+
 11. **1-Click Pre-Built Rule Templates & Vercel Cron for Stale PRs**:
     * *Templates*: Added 3 instant rule templates (`Alert on new dependency added`, `Stale PR reminder`, `Require review on sensitive paths`) allowing users to activate working automation without configuring raw regex or globs.
     * *Vercel Cron*: Created `/api/cron/stale-prs` running daily via `vercel.json` (`0 0 * * *`) that queries active repos using Octokit to detect PRs open with no activity for 7+ days, posting GitHub reminder comments and Slack alerts.

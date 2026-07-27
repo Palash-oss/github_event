@@ -5,7 +5,7 @@ import { authOptions } from "@/server/auth";
 import { createOrUpdateWebhook, createOctokit } from "@/server/github";
 import { getAppUrl } from "@/server/env";
 import { prisma } from "@/server/prisma";
-import { canConnectRepo } from "@/server/billing";
+
 
 export const runtime = "nodejs";
 
@@ -74,10 +74,6 @@ export async function POST(request: NextRequest) {
   }
 
   // Handle Connect Action
-  const connectedRepoCount = await prisma.repo.count({
-    where: { userId: user.id, active: true }
-  });
-
   const isExisting = await prisma.repo.findUnique({
     where: {
       userId_owner_name: {
@@ -88,9 +84,6 @@ export async function POST(request: NextRequest) {
     }
   });
 
-  if (!isExisting && !canConnectRepo(user, connectedRepoCount)) {
-    return NextResponse.redirect(new URL("/dashboard?error=repo_limit_reached", request.url), 303);
-  }
 
   const secret = randomBytes(32).toString("hex");
   const existingRepo = isExisting;

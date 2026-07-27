@@ -120,17 +120,18 @@ export default function RulesForm({ connectedRepos }: RulesFormProps) {
         <span className="eyebrow" style={{ fontSize: "0.75rem" }}>1-Click Rule Templates</span>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <button type="button" onClick={() => applyPreset("dependency")} className="button secondary" style={{ padding: "4px 10px", fontSize: "0.8rem" }}>
-            Alert on new dependency added (Pro)
+            Alert on new dependency added
           </button>
           <button type="button" onClick={() => applyPreset("stale")} className="button secondary" style={{ padding: "4px 10px", fontSize: "0.8rem" }}>
             Stale PR reminder
           </button>
           <button type="button" onClick={() => applyPreset("sensitive")} className="button secondary" style={{ padding: "4px 10px", fontSize: "0.8rem" }}>
-            Require review on sensitive paths (Pro)
+            Require review on sensitive paths
           </button>
           <button type="button" onClick={() => applyPreset("ai_p0")} className="button secondary" style={{ padding: "4px 10px", fontSize: "0.8rem" }}>
-            AI P0 Escalation (Pro)
+            AI P0 Escalation
           </button>
+
         </div>
       </div>
 

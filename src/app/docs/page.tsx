@@ -22,7 +22,7 @@ export default function DocsPage() {
         <span className="eyebrow">Documentation & User Guide</span>
         <h1 style={{ fontSize: "clamp(2rem, 3.5vw, 3rem)", margin: 0 }}>GitHub Automation Bot</h1>
         <p className="lede" style={{ marginTop: 8 }}>
-          A self-serve, resilient SaaS platform that listens to GitHub webhooks, runs codebase-aware rules and AI triage, and executes write-backs or multi-channel alerts with zero duplicate processing.
+          A self-serve, resilient platform that listens to GitHub webhooks, runs codebase-aware rules and AI triage, and executes write-backs or multi-channel alerts with zero duplicate processing.
         </p>
       </header>
 
@@ -34,7 +34,7 @@ export default function DocsPage() {
           <li><a href="#connecting-repo">2. Connecting a Repository</a></li>
           <li><a href="#templates">3. 1-Click Rule Templates</a></li>
           <li><a href="#custom-rules">4. Writing Custom Rules & Diff Matching</a></li>
-          <li><a href="#pricing">5. Pricing & Plan Differences</a></li>
+          <li><a href="#features">5. Included Features</a></li>
         </ul>
       </nav>
 
@@ -73,16 +73,16 @@ export default function DocsPage() {
         </p>
         <ul style={{ paddingLeft: 20, display: "flex", flexDirection: "column", gap: 10 }}>
           <li>
-            <strong>Alert on new dependency added (Pro)</strong>: Matches PR changes in <code>package.json</code>, <code>requirements.txt</code>, <code>go.mod</code>, <code>Cargo.toml</code>, or <code>Gemfile</code>. Adds <code>dependency-review</code> label and posts an audit notice.
+            <strong>Alert on new dependency added</strong>: Matches PR changes in <code>package.json</code>, <code>requirements.txt</code>, <code>go.mod</code>, <code>Cargo.toml</code>, or <code>Gemfile</code>. Adds <code>dependency-review</code> label and posts an audit notice.
           </li>
           <li>
             <strong>Stale PR reminder</strong>: Triggers on PRs flagged as stale by our daily background sweeper, adding <code>stale-pr</code> label and sending a review reminder.
           </li>
           <li>
-            <strong>Require review on sensitive paths (Pro)</strong>: Watches file modifications under <code>auth/</code>, <code>payments/</code>, <code>config/</code>, or <code>secrets/</code>, tagging PRs with <code>security-audit</code>.
+            <strong>Require review on sensitive paths</strong>: Watches file modifications under <code>auth/</code>, <code>payments/</code>, <code>config/</code>, or <code>secrets/</code>, tagging PRs with <code>security-audit</code>.
           </li>
           <li>
-            <strong>AI P0 Escalation (Pro)</strong>: Automatically escalates issues rated <code>P0 Critical</code> by LLM triage, adding <code>urgent-p0</code> label instantly.
+            <strong>AI P0 Escalation</strong>: Automatically escalates issues rated <code>P0 Critical</code> by LLM triage, adding <code>urgent-p0</code> label instantly.
           </li>
         </ul>
       </section>
@@ -121,7 +121,7 @@ export default function DocsPage() {
             </tr>
             <tr>
               <td><code>changed_files_match</code></td>
-              <td>Inspects PR file diffs via Octokit pagination (Pro)</td>
+              <td>Inspects PR file diffs via Octokit pagination</td>
               <td><code>*.prisma</code> or <code>src/auth/*</code></td>
             </tr>
             <tr>
@@ -141,47 +141,40 @@ export default function DocsPage() {
         </ul>
       </section>
 
-      {/* Section 5: Pricing & Plans */}
-      <section id="pricing" className="panel" style={{ marginBottom: 32 }}>
-        <h2>5. Pricing &amp; Plan Differences</h2>
+      {/* Section 5: Included Features */}
+      <section id="features" className="panel" style={{ marginBottom: 32 }}>
+        <h2>5. Included Capabilities</h2>
         <div style={{ overflowX: "auto" }}>
           <table className="table" style={{ width: "100%", marginTop: 12 }}>
             <thead>
               <tr>
                 <th>Feature</th>
-                <th>Free Tier ($0/mo)</th>
-                <th>Pro Tier ($19/mo)</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>Connected Repositories</td>
-                <td>1 repo</td>
-                <td><strong>Unlimited repos</strong></td>
+                <td><strong>✓ Unlimited repos</strong></td>
               </tr>
               <tr>
                 <td>Basic Rules (Title/Body/Author)</td>
-                <td>✓ Included</td>
-                <td>✓ Included</td>
+                <td><strong>✓ Included</strong></td>
               </tr>
               <tr>
                 <td>Codebase Diff Rules (<code>changed_files_match</code>)</td>
-                <td>Locked</td>
                 <td><strong>✓ Unlocked</strong></td>
               </tr>
               <tr>
                 <td>AI Triage Priority Escalate</td>
-                <td>Locked</td>
                 <td><strong>✓ Unlocked</strong></td>
               </tr>
               <tr>
                 <td>Regex &amp; Glob Path Matching</td>
-                <td>Locked</td>
                 <td><strong>✓ Unlocked</strong></td>
               </tr>
               <tr>
                 <td>Multi-Channel Alerts (Slack/Discord/Telegram)</td>
-                <td>✓ Included</td>
                 <td><strong>✓ Included</strong></td>
               </tr>
             </tbody>

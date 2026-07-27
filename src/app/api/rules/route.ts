@@ -2,9 +2,9 @@ import { getServerSession } from "next-auth/next";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "@/server/auth";
 import { prisma } from "@/server/prisma";
-import { isRuleTypeAllowed } from "@/server/billing";
 
 export const runtime = "nodejs";
+
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -57,14 +57,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "matchValue is required" }, { status: 400 });
   }
 
-  const user = await prisma.user.findUnique({ where: { id: session.user.id } });
-  if (!isRuleTypeAllowed(user, matchField)) {
-    return NextResponse.json({
-      error: `The rule type "${matchField}" is locked on the Free Tier. Upgrade to Pro ($19/mo) to unlock.`
-    }, { status: 403 });
-  }
-
   await prisma.rule.create({
+
     data: {
       repoId: repo.id,
       eventType,
