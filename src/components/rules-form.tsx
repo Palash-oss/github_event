@@ -146,7 +146,8 @@ export default function RulesForm({ connectedRepos }: RulesFormProps) {
           fontWeight: 500,
           color: status === "success" ? "rgb(48,164,108)" : status === "error" ? "rgb(229,72,77)" : "var(--text)"
         }}>
-          {status === "saving" ? "⏳ Saving rule..." : message}
+          {status === "saving" ? "Saving rule..." : message}
+
         </div>
       )}
 

@@ -108,7 +108,7 @@ textarea {
 
 /* Layout shell with slide-in animations */
 .shell {
-  width: min(1200px, calc(100vw - 40px));
+  width: min(1360px, calc(100vw - 48px));
   margin: 0 auto;
   padding: 48px 0 80px;
   display: flex;
@@ -116,6 +116,7 @@ textarea {
   gap: 32px;
   position: relative; /* Coordinate parent for aligned background grid */
 }
+
 
 /* Cards and Panels with beautiful glassmorphism */
 .hero,
@@ -263,10 +264,11 @@ h1 {
 
 .grid-2 {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
+  grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
   gap: 28px;
   margin-top: 8px;
   align-items: start;
+  min-width: 0;
 }
 
 .grid-rules {
@@ -274,7 +276,9 @@ h1 {
 }
 
 .panel {
-  padding: 36px;
+  padding: 32px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .panel h2 {
@@ -302,6 +306,7 @@ h1 {
   margin: 0;
   display: grid;
   gap: 16px;
+  min-width: 0;
 }
 
 .list li,
@@ -312,6 +317,7 @@ h1 {
   background: var(--bg-soft);
   border: 1px solid var(--panel-border);
   transition: var(--transition);
+  min-width: 0;
 }
 
 .list li:hover,
@@ -327,14 +333,18 @@ h1 {
 .log-card {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: 20px;
+  align-items: flex-start;
+  gap: 16px;
+  min-width: 0;
 }
 
 .repo-card .stack,
 .log-card .stack {
   gap: 6px;
+  min-width: 0;
+  flex: 1;
 }
+
 
 .repo-card strong,
 .log-card strong {

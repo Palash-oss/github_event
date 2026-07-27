@@ -127,10 +127,10 @@ export default function RecentEventsList({ initialEvents }: RecentEventsListProp
             return (
               <li key={event.id} style={{ listStyle: "none" }}>
                 <details className="event-details" style={{ width: "100%" }}>
-                  <summary className="log-card" suppressHydrationWarning style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <div className="stack" style={{ gap: 6 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <strong>{event.repo.owner}/{event.repo.name}</strong>
+                  <summary className="log-card" suppressHydrationWarning style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
+                    <div className="stack" style={{ gap: 6, flex: 1, minWidth: 0 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                        <strong style={{ wordBreak: "break-word" }}>{event.repo.owner}/{event.repo.name}</strong>
                         <span className="badge" style={{ padding: "2px 8px", fontSize: "10px" }}>{summary.typeLabel}</span>
                         {event.aiPriority && (
                           <span className={`badge ${priorityColor}`} style={{ padding: "2px 6px", fontSize: "10px" }}>
@@ -138,20 +138,21 @@ export default function RecentEventsList({ initialEvents }: RecentEventsListProp
                           </span>
                         )}
                       </div>
-                      <span className="log-meta" style={{ fontWeight: "600", fontSize: "0.95rem" }}>
+                      <span className="log-meta" style={{ fontWeight: "600", fontSize: "0.95rem", wordBreak: "break-word" }}>
                         {summary.title}
                       </span>
                       {event.aiSummary && (
-                        <span style={{ fontSize: "0.85rem", color: "var(--text)", background: "rgba(255,255,255,0.05)", padding: "4px 8px", borderRadius: "6px", width: "fit-content" }}>
+                        <span style={{ fontSize: "0.85rem", color: "var(--text)", background: "rgba(255,255,255,0.05)", padding: "6px 10px", borderRadius: "6px", wordBreak: "break-word" }}>
                           <strong>AI Summary:</strong> {event.aiSummary}
                         </span>
                       )}
-                      <span className="log-meta" style={{ fontSize: "0.82rem" }}>
+                      <span className="log-meta" style={{ fontSize: "0.82rem", wordBreak: "break-word" }}>
                         {summary.description} · by <strong>{summary.author}</strong> · {mounted ? new Date(event.receivedAt).toLocaleTimeString() : ""}
                       </span>
                     </div>
-                    <span className="badge muted" suppressHydrationWarning>{event.actions.length} actions</span>
+                    <span className="badge muted" style={{ flexShrink: 0, whiteSpace: "nowrap", marginTop: 2 }} suppressHydrationWarning>{event.actions.length} actions</span>
                   </summary>
+
                   <div style={{ padding: "16px 20px", background: "rgba(28, 27, 25, 0.03)", borderRadius: 12, border: "1px solid var(--panel-border)", marginTop: 8, fontSize: "0.9rem" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                       <p className="muted" style={{ fontStyle: "italic", fontSize: "0.88rem", margin: 0 }}>
