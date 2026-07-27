@@ -8,12 +8,17 @@ datasource db {
 }
 
 model User {
-  id          String   @id @default(cuid())
-  githubId    String   @unique
-  username    String
-  accessToken String
-  createdAt   DateTime @default(now())
-  repos       Repo[]
+  id                     String    @id @default(cuid())
+  githubId               String    @unique
+  username               String
+  accessToken            String
+  subscriptionStatus     String    @default("free")
+  stripeCustomerId       String?   @unique
+  stripeSubscriptionId   String?   @unique
+  stripePriceId          String?
+  stripeCurrentPeriodEnd DateTime?
+  createdAt              DateTime  @default(now())
+  repos                  Repo[]
 }
 
 model Repo {
@@ -44,6 +49,7 @@ model Rule {
   notifySlack   Boolean  @default(true)
   notifyDiscord Boolean  @default(false)
   notifyTelegram Boolean @default(false)
+  disabled      Boolean  @default(false)
   createdAt     DateTime @default(now())
 }
 

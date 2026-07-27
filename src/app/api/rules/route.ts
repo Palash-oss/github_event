@@ -5,6 +5,7 @@ import { prisma } from "@/server/prisma";
 
 export const runtime = "nodejs";
 
+
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
@@ -57,6 +58,7 @@ export async function POST(request: NextRequest) {
   }
 
   await prisma.rule.create({
+
     data: {
       repoId: repo.id,
       eventType,

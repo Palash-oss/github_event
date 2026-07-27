@@ -79,25 +79,31 @@ export default function RulesForm({ connectedRepos }: RulesFormProps) {
   const [actionLabel, setActionLabel] = useState("");
   const [actionComment, setActionComment] = useState("");
 
-  const applyPreset = (preset: "ai_p0" | "regex_jira" | "glob_db" | "bug") => {
-    if (preset === "ai_p0") {
+  const applyPreset = (preset: "dependency" | "stale" | "sensitive" | "ai_p0" | "bug") => {
+    if (preset === "dependency") {
+      setEventType("pull_request");
+      setMatchType("regex");
+      setMatchValue("(?i).*(package\\.json|requirements\\.txt|go\\.mod|Cargo\\.toml|Gemfile)");
+      setActionLabel("dependency-review");
+      setActionComment("Attention @dev-team: Dependency manifest changed in this PR. Please verify license & vulnerability audit.");
+    } else if (preset === "stale") {
+      setEventType("pull_request");
+      setMatchType("equals");
+      setMatchValue("stale");
+      setActionLabel("stale-pr");
+      setActionComment("Reminder: This pull request has had no activity for over 7 days. Please review or close if no longer needed.");
+    } else if (preset === "sensitive") {
+      setEventType("pull_request");
+      setMatchType("regex");
+      setMatchValue("(?i).*(auth|payments|security|config|secrets)/.*");
+      setActionLabel("security-audit");
+      setActionComment("Attention @security-team: Sensitive path modified in this PR. Require explicit approval before merge.");
+    } else if (preset === "ai_p0") {
       setEventType("issues");
       setMatchType("equals");
       setMatchValue("P0");
       setActionLabel("urgent-p0");
       setActionComment("AI Triage assessed this item as P0 Critical. Escalating immediately.");
-    } else if (preset === "regex_jira") {
-      setEventType("issues");
-      setMatchType("regex");
-      setMatchValue("CVE-\\d+|JIRA-\\d+");
-      setActionLabel("security-tracked");
-      setActionComment("Ticket reference detected in issue: {{title}}.");
-    } else if (preset === "glob_db") {
-      setEventType("push");
-      setMatchType("glob_match");
-      setMatchValue("*.prisma");
-      setActionLabel("");
-      setActionComment("");
     } else if (preset === "bug") {
       setEventType("issues");
       setMatchType("contains");
@@ -111,20 +117,21 @@ export default function RulesForm({ connectedRepos }: RulesFormProps) {
     <form ref={formRef} onSubmit={handleSubmit} className="stack" style={{ marginBottom: 24 }}>
       {/* 1-Click Preset Rule Templates */}
       <div className="stack" style={{ gap: 8 }}>
-        <span className="eyebrow" style={{ fontSize: "0.75rem" }}>Smart Rule Presets</span>
+        <span className="eyebrow" style={{ fontSize: "0.75rem" }}>1-Click Rule Templates</span>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <button type="button" onClick={() => applyPreset("dependency")} className="button secondary" style={{ padding: "4px 10px", fontSize: "0.8rem" }}>
+            Alert on new dependency added
+          </button>
+          <button type="button" onClick={() => applyPreset("stale")} className="button secondary" style={{ padding: "4px 10px", fontSize: "0.8rem" }}>
+            Stale PR reminder
+          </button>
+          <button type="button" onClick={() => applyPreset("sensitive")} className="button secondary" style={{ padding: "4px 10px", fontSize: "0.8rem" }}>
+            Require review on sensitive paths
+          </button>
           <button type="button" onClick={() => applyPreset("ai_p0")} className="button secondary" style={{ padding: "4px 10px", fontSize: "0.8rem" }}>
-            AI P0 Critical Escalation
+            AI P0 Escalation
           </button>
-          <button type="button" onClick={() => applyPreset("regex_jira")} className="button secondary" style={{ padding: "4px 10px", fontSize: "0.8rem" }}>
-            Regex Ticket / CVE Pattern
-          </button>
-          <button type="button" onClick={() => applyPreset("glob_db")} className="button secondary" style={{ padding: "4px 10px", fontSize: "0.8rem" }}>
-            Glob DB Schema Watch (*.prisma)
-          </button>
-          <button type="button" onClick={() => applyPreset("bug")} className="button secondary" style={{ padding: "4px 10px", fontSize: "0.8rem" }}>
-            Auto-Label Bugs
-          </button>
+
         </div>
       </div>
 

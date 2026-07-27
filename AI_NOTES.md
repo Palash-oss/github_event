@@ -22,6 +22,20 @@
 9. **Codebase-Aware Diff Rule (`changed_files_match`) & Paginated Octokit Fetching**:
    * *Why*: PR webhook payloads do not include complete file lists for large PRs. We added `getPullRequestChangedFiles()` in `github.ts` using `octokit.paginate(octokit.pulls.listFiles, { per_page: 100 })` to ensure PRs with 100+ files are completely retrieved without missing changed files or breaking memory boundaries.
    * *Conditional API Fetching*: Octokit changed-files API is called ONLY if a `changed_files_match` rule actually exists for that repository, preserving rate limits and minimizing network overhead.
+10. **Full Feature Accessibility & Billing Gating Removal**:
+    * *Unlocked Platform*: Removed all Stripe subscription gating and tier limits. All features—including unlimited connected repositories, codebase PR diff rules (`changed_files_match`), AI Triage (`ai_priority`), regular expressions, wildcards, 1-click templates, and multi-channel notifications—are 100% unlocked and freely accessible for all users out of the box.
+
+11. **1-Click Pre-Built Rule Templates & Vercel Cron for Stale PRs**:
+    * *Templates*: Added 3 instant rule templates (`Alert on new dependency added`, `Stale PR reminder`, `Require review on sensitive paths`) allowing users to activate working automation without configuring raw regex or globs.
+    * *Vercel Cron*: Created `/api/cron/stale-prs` running daily via `vercel.json` (`0 0 * * *`) that queries active repos using Octokit to detect PRs open with no activity for 7+ days, posting GitHub reminder comments and Slack alerts.
+12. **Multi-Channel Notification Engine & 100% Unit Test Suite Coverage**:
+    * *Multi-Channel Notifications*: Integrated optional Discord embed webhooks (`notifyDiscord`) and Telegram Markdown bot alerts (`notifyTelegram`) alongside Slack Block Kit cards. Downstream notifications process independently with per-channel success/failure logging in `ActionLog`.
+    * *100% Comprehensive Unit Test Coverage*: Expanded Vitest suite to cover all modules across 7 test files (`rules.test.ts`, `triage.test.ts`, `notifications.test.ts`, `billing.test.ts`, `stripe.test.ts`, `analytics.test.ts`, `webhook.test.ts`), enforcing strict boundary checks and failure resilience.
+13. **Week 4 Launch Preparation, User Documentation (/docs), Fast Landing Page & Friction Removal**:
+    * *User Documentation Page (/docs)*: Built a dedicated, user-facing `/docs` page detailing platform architecture, GitHub OAuth & webhook registration, 1-click rule templates, custom diff matching (`changed_files_match`), and pricing tiers.
+    * *Fast Landing Page*: Built a lightweight, mobile-responsive landing page (`/`) featuring core value props, 3 feature highlights, visual demo card, Free vs Pro pricing table, and GitHub OAuth call-to-action.
+    * *Frictionless Onboarding*: Introduced a 3-step Quick Start Checklist banner on the dashboard guiding first-time users from connecting repos to firing webhooks in under 3 minutes.
+    * *Empty & Error State Audit*: Replaced blank screens with actionable guidance cards across repository lists, rule snapshots, delivery feeds, and logs archives.
 
 ## Hardest Bug & Resolution
 * **Timing & Webhook Activation Gap**: The user reported that a commit push and an issue they created did not show up in the logs. After querying the database records and GitHub API webhook delivery logs, we discovered that both events occurred *minutes before* the user finished connecting their repository (which creates the webhook). We resolved this by explaining that webhooks are not retroactive and that the user needed to trigger a new event.

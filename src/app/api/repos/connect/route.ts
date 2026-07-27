@@ -6,6 +6,7 @@ import { createOrUpdateWebhook, createOctokit } from "@/server/github";
 import { getAppUrl } from "@/server/env";
 import { prisma } from "@/server/prisma";
 
+
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
@@ -73,8 +74,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Handle Connect Action
-  const secret = randomBytes(32).toString("hex");
-  const existingRepo = await prisma.repo.findUnique({
+  const isExisting = await prisma.repo.findUnique({
     where: {
       userId_owner_name: {
         userId: user.id,
@@ -83,6 +83,10 @@ export async function POST(request: NextRequest) {
       }
     }
   });
+
+
+  const secret = randomBytes(32).toString("hex");
+  const existingRepo = isExisting;
 
   const repoSecret = existingRepo?.webhookSecret ?? secret;
 

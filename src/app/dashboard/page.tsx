@@ -9,6 +9,8 @@ import { getEventSummary } from "@/lib/event-utils";
 import EventDetailsExpanded from "@/components/event-details-expanded";
 import RulesForm from "@/components/rules-form";
 import RecentEventsList from "@/components/recent-events-list";
+import QuickStartBanner from "@/components/quick-start-banner";
+
 
 export const dynamic = "force-dynamic";
 
@@ -87,6 +89,16 @@ export default async function DashboardPage() {
           </div>
         </div>
       </section>
+
+      <section>
+        <QuickStartBanner
+          hasConnectedRepos={connectedRepos.length > 0}
+          hasRules={connectedRepos.some((r) => r.rules.length > 0)}
+          hasEvents={recentEvents.length > 0}
+        />
+      </section>
+
+
 
       <section className="grid-2">
         <AvailableRepos connectedRepoKeys={connectedRepoKeys} />
