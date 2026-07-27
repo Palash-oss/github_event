@@ -38,8 +38,9 @@ export default function QuickStartBanner({
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "14px" }}>
         <div>
           <span className="eyebrow" style={{ color: "#3B82F6", fontSize: "0.75rem" }}>
-            🚀 Quick Start Checklist
+            Quick Start Checklist
           </span>
+
           <h3 style={{ margin: "4px 0 0 0", fontSize: "1.15rem", fontWeight: 600 }}>
             Get your first GitHub automation running in &lt; 3 minutes
           </h3>
