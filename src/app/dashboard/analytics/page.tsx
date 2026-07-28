@@ -31,117 +31,153 @@ export default async function AnalyticsPage() {
   const successRate = totalActions > 0 ? Math.round((successActions / totalActions) * 100) : 100;
 
   return (
-    <main className="shell stack fade-in-section">
-      <section className="hero" style={{ gridTemplateColumns: "1fr" }}>
+    <main className="shell stack fade-in-section" style={{ position: "relative" }}>
+      {/* Ambient background glowing auras */}
+      <div style={{ position: "absolute", top: -60, left: -60, width: 350, height: 350, background: "radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
+      <div style={{ position: "absolute", top: 200, right: -60, width: 350, height: 350, background: "radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
+
+      <section className="hero" style={{ gridTemplateColumns: "1fr", position: "relative", zIndex: 1 }}>
         <div className="stack">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
             <span className="eyebrow">Analytics & Operational Health</span>
-            <Link className="button secondary" href="/dashboard" style={{ padding: "6px 14px", fontSize: "0.85rem" }}>
+            <Link className="button secondary" href="/dashboard" style={{ padding: "8px 18px", fontSize: "0.88rem", borderRadius: "10px" }}>
               ← Back to Dashboard
             </Link>
           </div>
-          <h1 style={{ fontSize: "clamp(2rem, 3.5vw, 3.2rem)", margin: "14px 0" }}>System Performance & Webhook Metrics</h1>
+          <h1 style={{ fontSize: "clamp(2.2rem, 4vw, 3.6rem)", margin: "16px 0", background: "linear-gradient(135deg, #FFFFFF 0%, #CBD5E1 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            System Performance & Webhook Metrics
+          </h1>
           <p className="lede">
             Real-time breakdown of webhook volume, downstream action success rates, AI priority distributions, and event types.
           </p>
         </div>
       </section>
 
-      {/* Top Metric Cards */}
-      <section className="grid-2" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
-        <div className="panel" style={{ textAlign: "center", padding: "24px 16px" }}>
-          <span className="muted" style={{ fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: "1px" }}>Total Webhook Deliveries</span>
-          <h2 style={{ fontSize: "2.8rem", margin: "10px 0 0 0", color: "var(--text)" }}>{totalEvents}</h2>
+      {/* Top Glowing Metric Cards */}
+      <section className="grid-2" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 20, position: "relative", zIndex: 1 }}>
+        <div className="panel" style={{ padding: "28px 24px", position: "relative", overflow: "hidden", background: "rgba(15, 23, 42, 0.75)", border: "1px solid rgba(99, 102, 241, 0.3)", boxShadow: "0 8px 32px rgba(99, 102, 241, 0.15)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <span className="muted" style={{ fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "1.2px", fontWeight: 600 }}>Total Webhook Deliveries</span>
+            <span style={{ fontSize: "1.3rem" }}>⚡</span>
+          </div>
+          <h2 style={{ fontSize: "3rem", fontWeight: 700, margin: 0, background: "linear-gradient(135deg, #818CF8 0%, #6366F1 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            {totalEvents}
+          </h2>
+          <span className="muted" style={{ fontSize: "0.8rem", marginTop: 8, display: "block" }}>Captured & Logged</span>
         </div>
 
-        <div className="panel" style={{ textAlign: "center", padding: "24px 16px" }}>
-          <span className="muted" style={{ fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: "1px" }}>Action Success Rate</span>
-          <h2 style={{ fontSize: "2.8rem", margin: "10px 0 0 0", color: successRate >= 90 ? "#34c759" : "#ff9500" }}>
+        <div className="panel" style={{ padding: "28px 24px", position: "relative", overflow: "hidden", background: "rgba(15, 23, 42, 0.75)", border: `1px solid ${successRate >= 90 ? "rgba(16, 185, 129, 0.4)" : "rgba(245, 158, 11, 0.4)"}`, boxShadow: `0 8px 32px ${successRate >= 90 ? "rgba(16, 185, 129, 0.15)" : "rgba(245, 158, 11, 0.15)"}` }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <span className="muted" style={{ fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "1.2px", fontWeight: 600 }}>Action Success Rate</span>
+            <span style={{ fontSize: "1.3rem" }}>🎯</span>
+          </div>
+          <h2 style={{ fontSize: "3rem", fontWeight: 700, margin: 0, color: successRate >= 90 ? "#10B981" : "#F59E0B", textShadow: `0 0 20px ${successRate >= 90 ? "rgba(16, 185, 129, 0.4)" : "rgba(245, 158, 11, 0.4)"}` }}>
             {successRate}%
           </h2>
-          <span className="muted" style={{ fontSize: "0.8rem" }}>{successActions} succeeded / {failedActions} failed</span>
+          <span className="muted" style={{ fontSize: "0.8rem", marginTop: 8, display: "block" }}>{successActions} succeeded / {failedActions} failed</span>
         </div>
 
-        <div className="panel" style={{ textAlign: "center", padding: "24px 16px" }}>
-          <span className="muted" style={{ fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: "1px" }}>Active Webhooks</span>
-          <h2 style={{ fontSize: "2.8rem", margin: "10px 0 0 0", color: "var(--text)" }}>{totalRepos}</h2>
+        <div className="panel" style={{ padding: "28px 24px", position: "relative", overflow: "hidden", background: "rgba(15, 23, 42, 0.75)", border: "1px solid rgba(168, 85, 247, 0.3)", boxShadow: "0 8px 32px rgba(168, 85, 247, 0.15)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <span className="muted" style={{ fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "1.2px", fontWeight: 600 }}>Active Webhooks</span>
+            <span style={{ fontSize: "1.3rem" }}>🔗</span>
+          </div>
+          <h2 style={{ fontSize: "3rem", fontWeight: 700, margin: 0, background: "linear-gradient(135deg, #C084FC 0%, #A855F7 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            {totalRepos}
+          </h2>
+          <span className="muted" style={{ fontSize: "0.8rem", marginTop: 8, display: "block" }}>Connected Repositories</span>
         </div>
 
-        <div className="panel" style={{ textAlign: "center", padding: "24px 16px" }}>
-          <span className="muted" style={{ fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: "1px" }}>Downstream Actions</span>
-          <h2 style={{ fontSize: "2.8rem", margin: "10px 0 0 0", color: "var(--text)" }}>{totalActions}</h2>
+        <div className="panel" style={{ padding: "28px 24px", position: "relative", overflow: "hidden", background: "rgba(15, 23, 42, 0.75)", border: "1px solid rgba(56, 189, 248, 0.3)", boxShadow: "0 8px 32px rgba(56, 189, 248, 0.15)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <span className="muted" style={{ fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "1.2px", fontWeight: 600 }}>Downstream Actions</span>
+            <span style={{ fontSize: "1.3rem" }}>🤖</span>
+          </div>
+          <h2 style={{ fontSize: "3rem", fontWeight: 700, margin: 0, background: "linear-gradient(135deg, #38BDF8 0%, #0284C7 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            {totalActions}
+          </h2>
+          <span className="muted" style={{ fontSize: "0.8rem", marginTop: 8, display: "block" }}>Executed Rules</span>
         </div>
       </section>
 
       {/* Visual Progress Breakdown */}
-      <section className="grid-2">
-        <div className="panel">
+      <section className="grid-2" style={{ position: "relative", zIndex: 1, gap: 24 }}>
+        <div className="panel" style={{ padding: 32, background: "rgba(15, 23, 42, 0.8)", border: "1px solid var(--panel-border)" }}>
           <h2><span>Event Type Distribution</span></h2>
-          <p className="muted" style={{ marginBottom: 20 }}>Categorized by GitHub webhook payload source.</p>
-          <div className="stack" style={{ gap: 16 }}>
+          <p className="muted" style={{ marginBottom: 24 }}>Categorized by GitHub webhook payload source.</p>
+          <div className="stack" style={{ gap: 20 }}>
             <div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: "0.9rem" }}>
-                <span>Issues</span>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: "0.92rem" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#6366F1", boxShadow: "0 0 10px #6366F1" }} />
+                  <strong>Issues</strong>
+                </span>
                 <strong>{issuesCount} ({totalEvents > 0 ? Math.round((issuesCount / totalEvents) * 100) : 0}%)</strong>
               </div>
-              <div style={{ height: 8, background: "rgba(255,255,255,0.1)", borderRadius: 4, overflow: "hidden" }}>
-                <div style={{ width: `${totalEvents > 0 ? (issuesCount / totalEvents) * 100 : 0}%`, height: "100%", background: "#007aff" }} />
+              <div style={{ height: 10, background: "rgba(255,255,255,0.08)", borderRadius: 999, overflow: "hidden", padding: 2 }}>
+                <div style={{ width: `${totalEvents > 0 ? (issuesCount / totalEvents) * 100 : 0}%`, height: "100%", background: "linear-gradient(90deg, #6366F1, #818CF8)", borderRadius: 999, boxShadow: "0 0 12px rgba(99, 102, 241, 0.6)", transition: "width 0.6s cubic-bezier(0.16, 1, 0.3, 1)" }} />
               </div>
             </div>
 
             <div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: "0.9rem" }}>
-                <span>Pull Requests</span>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: "0.92rem" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#A855F7", boxShadow: "0 0 10px #A855F7" }} />
+                  <strong>Pull Requests</strong>
+                </span>
                 <strong>{prCount} ({totalEvents > 0 ? Math.round((prCount / totalEvents) * 100) : 0}%)</strong>
               </div>
-              <div style={{ height: 8, background: "rgba(255,255,255,0.1)", borderRadius: 4, overflow: "hidden" }}>
-                <div style={{ width: `${totalEvents > 0 ? (prCount / totalEvents) * 100 : 0}%`, height: "100%", background: "#af52de" }} />
+              <div style={{ height: 10, background: "rgba(255,255,255,0.08)", borderRadius: 999, overflow: "hidden", padding: 2 }}>
+                <div style={{ width: `${totalEvents > 0 ? (prCount / totalEvents) * 100 : 0}%`, height: "100%", background: "linear-gradient(90deg, #A855F7, #C084FC)", borderRadius: 999, boxShadow: "0 0 12px rgba(168, 85, 247, 0.6)", transition: "width 0.6s cubic-bezier(0.16, 1, 0.3, 1)" }} />
               </div>
             </div>
 
             <div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: "0.9rem" }}>
-                <span>Pushes & Commits</span>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: "0.92rem" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#10B981", boxShadow: "0 0 10px #10B981" }} />
+                  <strong>Pushes & Commits</strong>
+                </span>
                 <strong>{pushCount} ({totalEvents > 0 ? Math.round((pushCount / totalEvents) * 100) : 0}%)</strong>
               </div>
-              <div style={{ height: 8, background: "rgba(255,255,255,0.1)", borderRadius: 4, overflow: "hidden" }}>
-                <div style={{ width: `${totalEvents > 0 ? (pushCount / totalEvents) * 100 : 0}%`, height: "100%", background: "#34c759" }} />
+              <div style={{ height: 10, background: "rgba(255,255,255,0.08)", borderRadius: 999, overflow: "hidden", padding: 2 }}>
+                <div style={{ width: `${totalEvents > 0 ? (pushCount / totalEvents) * 100 : 0}%`, height: "100%", background: "linear-gradient(90deg, #10B981, #34D399)", borderRadius: 999, boxShadow: "0 0 12px rgba(16, 185, 129, 0.6)", transition: "width 0.6s cubic-bezier(0.16, 1, 0.3, 1)" }} />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="panel">
+        <div className="panel" style={{ padding: 32, background: "rgba(15, 23, 42, 0.8)", border: "1px solid var(--panel-border)" }}>
           <h2><span>AI Priority Ratings</span></h2>
-          <p className="muted" style={{ marginBottom: 20 }}>Categorized by automated AI triage sentiment.</p>
-          <div className="stack" style={{ gap: 16 }}>
+          <p className="muted" style={{ marginBottom: 24 }}>Categorized by automated AI triage sentiment.</p>
+          <div className="stack" style={{ gap: 20 }}>
             <div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: "0.9rem" }}>
-                <span className="badge danger">P0 — Critical / Security</span>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: "0.92rem" }}>
+                <span className="badge danger" style={{ boxShadow: "0 0 12px rgba(244, 63, 94, 0.3)" }}>P0 — Critical / Security</span>
                 <strong>{p0Count}</strong>
               </div>
-              <div style={{ height: 8, background: "rgba(255,255,255,0.1)", borderRadius: 4, overflow: "hidden" }}>
-                <div style={{ width: `${totalEvents > 0 ? (p0Count / totalEvents) * 100 : 0}%`, height: "100%", background: "#ff3b30" }} />
+              <div style={{ height: 10, background: "rgba(255,255,255,0.08)", borderRadius: 999, overflow: "hidden", padding: 2 }}>
+                <div style={{ width: `${totalEvents > 0 ? (p0Count / totalEvents) * 100 : 0}%`, height: "100%", background: "linear-gradient(90deg, #F43F5E, #FB7185)", borderRadius: 999, boxShadow: "0 0 12px rgba(244, 63, 94, 0.6)", transition: "width 0.6s cubic-bezier(0.16, 1, 0.3, 1)" }} />
               </div>
             </div>
 
             <div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: "0.9rem" }}>
-                <span className="badge warn">P1 — High / Feature</span>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: "0.92rem" }}>
+                <span className="badge warn" style={{ boxShadow: "0 0 12px rgba(245, 158, 11, 0.3)" }}>P1 — High / Feature</span>
                 <strong>{p1Count}</strong>
               </div>
-              <div style={{ height: 8, background: "rgba(255,255,255,0.1)", borderRadius: 4, overflow: "hidden" }}>
-                <div style={{ width: `${totalEvents > 0 ? (p1Count / totalEvents) * 100 : 0}%`, height: "100%", background: "#ff9500" }} />
+              <div style={{ height: 10, background: "rgba(255,255,255,0.08)", borderRadius: 999, overflow: "hidden", padding: 2 }}>
+                <div style={{ width: `${totalEvents > 0 ? (p1Count / totalEvents) * 100 : 0}%`, height: "100%", background: "linear-gradient(90deg, #F59E0B, #FBBF24)", borderRadius: 999, boxShadow: "0 0 12px rgba(245, 158, 11, 0.6)", transition: "width 0.6s cubic-bezier(0.16, 1, 0.3, 1)" }} />
               </div>
             </div>
 
             <div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: "0.9rem" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: "0.92rem" }}>
                 <span className="badge muted">P2 — Minor / Chore</span>
                 <strong>{p2Count}</strong>
               </div>
-              <div style={{ height: 8, background: "rgba(255,255,255,0.1)", borderRadius: 4, overflow: "hidden" }}>
-                <div style={{ width: `${totalEvents > 0 ? (p2Count / totalEvents) * 100 : 0}%`, height: "100%", background: "#8e8e93" }} />
+              <div style={{ height: 10, background: "rgba(255,255,255,0.08)", borderRadius: 999, overflow: "hidden", padding: 2 }}>
+                <div style={{ width: `${totalEvents > 0 ? (p2Count / totalEvents) * 100 : 0}%`, height: "100%", background: "linear-gradient(90deg, #94A3B8, #CBD5E1)", borderRadius: 999, boxShadow: "0 0 12px rgba(148, 163, 184, 0.4)", transition: "width 0.6s cubic-bezier(0.16, 1, 0.3, 1)" }} />
               </div>
             </div>
           </div>

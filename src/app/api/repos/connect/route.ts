@@ -29,6 +29,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
+  const isJson = request.headers.get("accept")?.includes("application/json") || request.headers.get("content-type")?.includes("application/json");
+
   // Handle Disconnect Action
   if (intent === "disconnect") {
     const existingRepo = await prisma.repo.findFirst({
@@ -54,7 +56,7 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // 2. Pre-fetch event IDs to perform safe scalar delete for ActionLogs (avoids relation filtering bug in deleteMany)
+      // 2. Pre-fetch event IDs to perform safe scalar delete for ActionLogs
       const repoEvents = await prisma.event.findMany({
         where: { repoId: existingRepo.id },
         select: { id: true }
@@ -70,6 +72,9 @@ export async function POST(request: NextRequest) {
       ]);
     }
 
+    if (isJson) {
+      return NextResponse.json({ ok: true, connected: false });
+    }
     return NextResponse.redirect(new URL("/dashboard", request.url), 303);
   }
 
@@ -84,10 +89,8 @@ export async function POST(request: NextRequest) {
     }
   });
 
-
   const secret = randomBytes(32).toString("hex");
   const existingRepo = isExisting;
-
   const repoSecret = existingRepo?.webhookSecret ?? secret;
 
   const repo = await prisma.repo.upsert({
@@ -126,6 +129,10 @@ export async function POST(request: NextRequest) {
       where: { id: repo.id },
       data: { webhookId }
     });
+  }
+
+  if (isJson) {
+    return NextResponse.json({ ok: true, connected: true, repoId: repo.id });
   }
 
   return NextResponse.redirect(new URL("/dashboard", request.url), 303);

@@ -66,11 +66,17 @@ export default async function DashboardPage() {
   const serializedConnectedRepos = JSON.parse(JSON.stringify(connectedRepos));
 
   return (
-    <main className="shell stack fade-in-section">
-      <section className="hero" style={{ gridTemplateColumns: "1fr" }}>
+    <main className="shell stack fade-in-section" style={{ position: "relative" }}>
+      {/* Ambient background glowing auras */}
+      <div style={{ position: "absolute", top: -60, left: -60, width: 350, height: 350, background: "radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
+      <div style={{ position: "absolute", top: 350, right: -60, width: 350, height: 350, background: "radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
+
+      <section className="hero" style={{ gridTemplateColumns: "1fr", position: "relative", zIndex: 1 }}>
         <div className="stack">
           <span className="eyebrow">Dashboard</span>
-          <h1 style={{ fontSize: "clamp(2.2rem, 4vw, 3.6rem)", margin: "16px 0" }}>Connected repos, incoming events, and action logs.</h1>
+          <h1 style={{ fontSize: "clamp(2.2rem, 4vw, 3.6rem)", margin: "16px 0", background: "linear-gradient(135deg, #FFFFFF 0%, #CBD5E1 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            Connected repos, incoming events, and action logs.
+          </h1>
           <p className="lede">
             Signed in as <strong>{user.username}</strong>. Connect a repository below to configure the webhook, then watch issues and pull requests flow through the rules engine.
           </p>

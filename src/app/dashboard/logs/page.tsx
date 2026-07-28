@@ -29,17 +29,23 @@ export default async function LogsPage() {
   });
 
   return (
-    <main className="shell stack fade-in-section">
-      <section className="hero" style={{ gridTemplateColumns: "1fr" }}>
+    <main className="shell stack fade-in-section" style={{ position: "relative" }}>
+      {/* Ambient background glowing auras */}
+      <div style={{ position: "absolute", top: -60, left: -60, width: 350, height: 350, background: "radial-gradient(circle, rgba(168, 85, 247, 0.18) 0%, transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
+      <div style={{ position: "absolute", top: 200, right: -60, width: 350, height: 350, background: "radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
+
+      <section className="hero" style={{ gridTemplateColumns: "1fr", position: "relative", zIndex: 1 }}>
         <div className="stack">
-          <span className="eyebrow">Observability</span>
-          <h1 style={{ fontSize: "clamp(2.2rem, 4vw, 3.6rem)", margin: "16px 0" }}>Logs & Event Archive</h1>
-          <p className="lede">This page archives all incoming webhook payloads from GitHub (Pings, Pushes, Issues, and PRs) and lists their execution states.</p>
-          <div className="actions">
-            <Link className="button secondary" href="/dashboard">
-              Back to Dashboard
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+            <span className="eyebrow">Observability</span>
+            <Link className="button secondary" href="/dashboard" style={{ padding: "8px 18px", fontSize: "0.88rem", borderRadius: "10px" }}>
+              ← Back to Dashboard
             </Link>
           </div>
+          <h1 style={{ fontSize: "clamp(2.2rem, 4vw, 3.6rem)", margin: "16px 0", background: "linear-gradient(135deg, #FFFFFF 0%, #CBD5E1 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            Logs & Event Archive
+          </h1>
+          <p className="lede">This page archives all incoming webhook payloads from GitHub (Pings, Pushes, Issues, and PRs) and lists their execution states.</p>
         </div>
       </section>
 

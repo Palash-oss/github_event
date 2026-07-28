@@ -21,6 +21,12 @@ export default function AvailableRepos({ connectedRepoKeys }: AvailableReposProp
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
+  const [connectingMap, setConnectingMap] = useState<Record<string, boolean>>({});
+  const [connectedSet, setConnectedSet] = useState<Set<string>>(new Set(connectedRepoKeys));
+
+  useEffect(() => {
+    setConnectedSet(new Set(connectedRepoKeys));
+  }, [connectedRepoKeys]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -42,7 +48,31 @@ export default function AvailableRepos({ connectedRepoKeys }: AvailableReposProp
       });
   }, []);
 
-  const connectedSet = new Set(connectedRepoKeys);
+  async function handleConnectRepo(owner: string, name: string, fullName: string) {
+    setConnectingMap(prev => ({ ...prev, [fullName]: true }));
+    try {
+      const formData = new FormData();
+      formData.append("intent", "connect");
+      formData.append("owner", owner);
+      formData.append("name", name);
+
+      const res = await fetch("/api/repos/connect", {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: formData
+      });
+
+      if (res.ok) {
+        setConnectedSet(prev => new Set(prev).add(fullName));
+        // Soft refresh page data without full white flash
+        window.location.href = "/dashboard";
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setConnectingMap(prev => ({ ...prev, [fullName]: false }));
+    }
+  }
 
   const PAGE_SIZE = 5;
   const visibleRepos = showAll ? repos : repos.slice(0, PAGE_SIZE);
@@ -64,9 +94,6 @@ export default function AvailableRepos({ connectedRepoKeys }: AvailableReposProp
         Repos you can connect from GitHub. Connect one to start receiving webhook events.
       </p>
 
-
-
-
       {isLoading ? (
         <ul className="repo-list">
           {[1, 2, 3].map((n) => (
@@ -80,7 +107,6 @@ export default function AvailableRepos({ connectedRepoKeys }: AvailableReposProp
                 borderRadius: 12
               }}
             >
-              {/* Skeleton UI placeholder */}
             </li>
           ))}
         </ul>
@@ -102,6 +128,8 @@ export default function AvailableRepos({ connectedRepoKeys }: AvailableReposProp
           <ul className="repo-list">
             {visibleRepos.map((repo) => {
               const connected = connectedSet.has(repo.fullName);
+              const isConnecting = connectingMap[repo.fullName];
+
               return (
                 <li className="repo-card" key={repo.id}>
                   <div className="stack" style={{ gap: 8 }}>
@@ -114,19 +142,16 @@ export default function AvailableRepos({ connectedRepoKeys }: AvailableReposProp
                     <span className="repo-meta">{repo.description || "No description"}</span>
                     <span className={`badge ${connected ? "success" : "muted"}`}>{connected ? "connected" : "available"}</span>
                   </div>
-                  <form action="/api/repos/connect" method="post">
-                    <input type="hidden" name="owner" value={repo.owner} />
-                    <input type="hidden" name="name" value={repo.name} />
-                    <button
-                      className="button primary"
-                      type="submit"
-                      disabled={connected}
-                      suppressHydrationWarning
-                      style={{ padding: "10px 18px", borderRadius: "10px", fontSize: "0.9rem" }}
-                    >
-                      {connected ? "Connected" : "Connect"}
-                    </button>
-                  </form>
+                  
+                  <button
+                    className="button primary"
+                    onClick={() => handleConnectRepo(repo.owner, repo.name, repo.fullName)}
+                    disabled={connected || isConnecting}
+                    suppressHydrationWarning
+                    style={{ padding: "10px 18px", borderRadius: "10px", fontSize: "0.9rem" }}
+                  >
+                    {isConnecting ? "Connecting..." : connected ? "Connected" : "Connect"}
+                  </button>
                 </li>
               );
             })}
