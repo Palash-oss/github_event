@@ -58,7 +58,7 @@ export default async function AnalyticsPage() {
         <div className="panel" style={{ padding: "28px 24px", position: "relative", overflow: "hidden", background: "rgba(15, 23, 42, 0.75)", border: "1px solid rgba(99, 102, 241, 0.3)", boxShadow: "0 8px 32px rgba(99, 102, 241, 0.15)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
             <span className="muted" style={{ fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "1.2px", fontWeight: 600 }}>Total Webhook Deliveries</span>
-            <span style={{ fontSize: "1.3rem" }}>⚡</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#818CF8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
           </div>
           <h2 style={{ fontSize: "3rem", fontWeight: 700, margin: 0, background: "linear-gradient(135deg, #818CF8 0%, #6366F1 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
             {totalEvents}
@@ -69,7 +69,7 @@ export default async function AnalyticsPage() {
         <div className="panel" style={{ padding: "28px 24px", position: "relative", overflow: "hidden", background: "rgba(15, 23, 42, 0.75)", border: `1px solid ${successRate >= 90 ? "rgba(16, 185, 129, 0.4)" : "rgba(245, 158, 11, 0.4)"}`, boxShadow: `0 8px 32px ${successRate >= 90 ? "rgba(16, 185, 129, 0.15)" : "rgba(245, 158, 11, 0.15)"}` }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
             <span className="muted" style={{ fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "1.2px", fontWeight: 600 }}>Action Success Rate</span>
-            <span style={{ fontSize: "1.3rem" }}>🎯</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
           </div>
           <h2 style={{ fontSize: "3rem", fontWeight: 700, margin: 0, color: successRate >= 90 ? "#10B981" : "#F59E0B", textShadow: `0 0 20px ${successRate >= 90 ? "rgba(16, 185, 129, 0.4)" : "rgba(245, 158, 11, 0.4)"}` }}>
             {successRate}%
@@ -80,7 +80,7 @@ export default async function AnalyticsPage() {
         <div className="panel" style={{ padding: "28px 24px", position: "relative", overflow: "hidden", background: "rgba(15, 23, 42, 0.75)", border: "1px solid rgba(168, 85, 247, 0.3)", boxShadow: "0 8px 32px rgba(168, 85, 247, 0.15)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
             <span className="muted" style={{ fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "1.2px", fontWeight: 600 }}>Active Webhooks</span>
-            <span style={{ fontSize: "1.3rem" }}>🔗</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A855F7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
           </div>
           <h2 style={{ fontSize: "3rem", fontWeight: 700, margin: 0, background: "linear-gradient(135deg, #C084FC 0%, #A855F7 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
             {totalRepos}
@@ -91,7 +91,7 @@ export default async function AnalyticsPage() {
         <div className="panel" style={{ padding: "28px 24px", position: "relative", overflow: "hidden", background: "rgba(15, 23, 42, 0.75)", border: "1px solid rgba(56, 189, 248, 0.3)", boxShadow: "0 8px 32px rgba(56, 189, 248, 0.15)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
             <span className="muted" style={{ fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "1.2px", fontWeight: 600 }}>Downstream Actions</span>
-            <span style={{ fontSize: "1.3rem" }}>🤖</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38BDF8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
           </div>
           <h2 style={{ fontSize: "3rem", fontWeight: 700, margin: 0, background: "linear-gradient(135deg, #38BDF8 0%, #0284C7 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
             {totalActions}
