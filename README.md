@@ -1,83 +1,114 @@
-# GitHub Automation Bot 🤖
+# GitHub Automation Bot SaaS
 
-A production-grade, highly responsive GitHub automation bot built with **Next.js 14 (App Router)**, **Auth.js**, **Prisma ORM**, **Neon serverless Postgres**, **Octokit REST/Webhooks**, and **Slack Block Kit**.
-
----
-
-## 🚀 Key Features
-
-1. **GitHub OAuth & Repository Connector**: Secure sign-in. Automatically sets up webhooks (`issues`, `pull_request`, `push` events) with custom secret signatures on your repositories.
-2. **Dynamic Rules Engine**: Configure custom rules on your dashboard:
-   * **Issues/PRs**: Match on title, body, author, or event action (e.g., `opened`, `closed`, `labeled`). Triggers auto-tagging labels, posting comments, and Slack messages.
-   * **Push Events**: Match on commit message, target branch (ref), or committer username. Triggers Slack notifications.
-3. **Interactive Slack Block Kit Messages**: Slack notifications are styled as visually premium cards with contextual buttons (*Close Issue*, *View on GitHub*, *View Repository*) that handle live click events and perform actions back on GitHub.
-4. **Real-Time Live Dashboard**: A Client Component that polls the database every 4 seconds to instantly slide in new incoming webhook deliveries and their status without reloading the page.
-5. **Smart Repos Panel**: Automatically handles large accounts with a compact view (5 items by default), custom pagination toggles, private/public badges, and total repo count dynamically fetched from GitHub.
-6. **Detailed Delivery Logs**: Collapsible log cards detail exactly what occurred, separating successful actions, retry sweeps, errors, and displaying a helpful placeholder for events with no matching rules.
+A production-grade, multi-tenant SaaS application that automates repository workflows, issue triage, code change auditing, and team notifications. Built with **Next.js 14 (App Router)**, **Auth.js**, **Prisma ORM**, **Neon Serverless Postgres**, **Stripe Subscription Billing**, **Octokit REST/Webhooks**, and **Slack Block Kit**.
 
 ---
 
-## 🛠️ Local Setup
+## Key Features & Architecture
 
-1. **Clone & Install**:
-   ```bash
-   npm install
-   ```
+### 1. Multi-Tenant GitHub OAuth & Webhook Security
+* **Authentication**: Secure sign-in via GitHub OAuth with token persistence.
+* **Automated Webhooks**: Dynamically registers HMAC-signed webhooks on connected repositories.
+* **Cryptographic Verification**: Validates every incoming payload using `x-hub-signature-256` with constant-time signature comparison (`crypto.timingSafeEqual`) to prevent spoofing.
 
-2. **Configure Environment**:
-   Copy `.env.example` to `.env.local` and fill in:
-   ```env
-   NEXTAUTH_URL=http://localhost:3000
-   NEXTAUTH_SECRET=your_nextauth_secret
-   APP_URL=http://localhost:3000
-   DATABASE_URL=postgresql://your_db_credentials
-   GITHUB_CLIENT_ID=your_github_client_id
-   GITHUB_CLIENT_SECRET=your_github_client_secret
-   SLACK_WEBHOOK_URL=your_slack_webhook_url
-   CRON_SECRET=your_cron_secret
-   ```
+### 2. Powerful Rules & Triage Engine
+* **Flexible Matching**: Match events by `title`, `body`, `author`, `action`, `branch`, or custom patterns.
+* **Diff-Aware Rules (`changed_files_match`)**: Inspects PR file changes to trigger rules when sensitive paths (e.g. `auth/`, `payments/`, `package.json`) are modified.
+* **Multichannel Actions**: Automatically apply GitHub labels, post comments, and send notifications to Slack, Discord, or Telegram.
 
-3. **Database Migration**:
-   ```bash
-   npm run prisma:generate
-   # Apply migrations to your Postgres instance
-   npx prisma db push
-   ```
+### 3. Stripe Subscription Billing & Feature Gating
+* **Two-Tier Model**:
+  * **Free Tier**: 1 connected repository, standard text-matching rules.
+  * **Pro Tier ($19/mo)**: Unlimited connected repositories, advanced diff rules (`changed_files_match`), AI Triage, and cron automation.
+* **Self-Serve Portals**: Integrated **Stripe Checkout** for upgrades and **Stripe Customer Portal** for plan management.
+* **Graceful Downgrades**: Automatically pauses extra repositories and sets Pro rules to `disabled: true` upon subscription cancellation without deleting user data.
 
-4. **Start Dev Server**:
-   ```bash
-   npm run dev
-   ```
+### 4. 1-Click Pre-Built Rule Templates & Vercel Cron
+* **Dependency Alert**: Notifies when dependency files (`package.json`, `requirements.txt`, etc.) are modified.
+* **Sensitive Path Review**: Flags PRs touching core authentication or payment modules.
+* **Stale PR Sweeper**: Background Vercel Cron job (`/api/cron/stale-prs`) that runs daily to identify PRs inactive for 7+ days.
+
+### 5. Real-Time Observability & Interactive Slack Integration
+* **Live SSE & Polling Dashboard**: Real-time event stream (`/api/events/stream`) backed by fallback polling to display incoming webhooks without page reloads.
+* **Interactive 2-Way Slack Cards**: Slack Block Kit notifications feature interactive buttons (e.g., *Close Issue*, *View on GitHub*) that route actions back to GitHub.
+* **Operational Analytics**: Comprehensive health metrics, action success rates, and priority breakdown graphs.
 
 ---
 
-## 📦 Deployment
+## Local Development Setup
 
-* **Hosting**: Deployed on **Vercel** (`https://github-event-bztr3.vercel.app`).
-* **Database**: Hosted on **Neon Serverless Postgres** with auto-suspend protection (`connect_timeout=30` added to prevent cold-start disconnect warnings).
-* **GitHub OAuth App**: Configured on GitHub Developer Settings with homepage and authorization callback pointing to:
-  * Deployed: `https://github-event-bztr3.vercel.app/api/auth/callback/github`
+### 1. Clone & Install
+```bash
+npm install
+```
+
+### 2. Configure Environment Variables
+Copy `.env.example` to `.env.local` and configure the required keys:
+
+```env
+# App & Auth
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your_nextauth_secret_here
+APP_URL=http://localhost:3000
+
+# Database (Neon / Postgres)
+DATABASE_URL=postgresql://user:password@localhost:5432/dbname?schema=public
+
+# GitHub OAuth
+GITHUB_CLIENT_ID=your_github_client_id
+GITHUB_CLIENT_SECRET=your_github_client_secret
+
+# Stripe Billing
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_PRO_PRICE_ID=price_...
+
+# Notifications & Automation
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
+CRON_SECRET=your_cron_secret_here
+```
+
+### 3. Database Migration
+```bash
+npx prisma generate
+npx prisma db push
+```
+
+### 4. Start Development Server
+```bash
+npm run dev
+```
+
+---
+
+## Production Deployment (Vercel)
+
+* **Deployment Host**: Deployed on **Vercel** (`https://github-event-b3z3.vercel.app`).
+* **Database**: Hosted on **Neon Serverless Postgres** (`connect_timeout=30` enabled for cold-start resilience).
+* **OAuth Callback URLs**:
+  * Production: `https://github-event-b3z3.vercel.app/api/auth/callback/github`
   * Local: `http://localhost:3000/api/auth/callback/github`
 
 ---
 
-## 🧪 How to Test It
+## Testing & Verification
 
-For full testing instructions and a demo walkthrough script, please refer to the auto-generated **DEMO_VIDEO_GUIDE.md** in the project root.
+Run the full automated test suite (Unit, Integration, and Billing tests):
 
-1. **Login**: Go to your deployment or localhost, click **Sign in with GitHub**.
-2. **Connect**: Connect a repository (e.g., `Palash-oss/DLRL`). The bot will register the webhook.
-3. **Create Rule**: In the dashboard, configure a rule matching `issues` when the `title` contains `bug`. Set the action label to `bug` and write an action comment.
-4. **Trigger**: Go to your GitHub repository and open a new issue with "bug" in the title.
-5. **Verify**:
-   * Watch the live dashboard feed slide in the new delivery.
-   * Verify the label `bug` and your comment are auto-applied on GitHub within 3 seconds.
-   * Check your Slack channel for the interactive block card.
+```bash
+# Run Vitest test suite
+npm run test
+
+# Run TypeScript compilation check
+npx tsc --noEmit
+```
+
+For step-by-step manual testing instructions for Stripe Test Mode and Webhooks, refer to the [walkthrough documentation](file:///C:/Users/Palash/.gemini/antigravity-ide/brain/62523120-4f42-4b77-b115-689a755a90ef/walkthrough.md).
 
 ---
 
-## 🤖 AI Context & Instruction Files
+## Architecture & Engineering Notes
 
-* **CLAUDE.md**: Build instructions, commands, and rules used to guide the pair-programming assistant.
-* **AI_NOTES.md**: Key architectural decisions, hard bugs solved (such as solving silent client-side component crashes from importing server modules), and future roadmap.
-* *Note: No `.cursorrules` or `AGENTS.md` configurations were used during development.*
+* **CLAUDE.md**: Developer commands and build guidelines.
+* **AI_NOTES.md**: Key architectural decisions, tenant isolation models, and performance optimizations.
